@@ -1,0 +1,17 @@
+import java_cup.runtime.Symbol;
+
+terminal T_plus, T_times, T_lpar, T_rpar, T_num;
+non terminal expr, factor, term;
+
+start with expr;
+
+expr ::= expr T_plus factor
+       | factor
+       ;
+
+factor ::= factor T_times term
+       |   term
+       ;
+term  ::= T_num
+        | T_lpar expr T_rpar
+        ;
