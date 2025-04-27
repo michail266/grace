@@ -43,7 +43,7 @@ public static class Token {
 
 delim =      [ \t\r\n]
 ws    =      {delim}+
-l     =      [A-Za-z]
+l     =      [A-Za-z][A-Za-z0-9_-]*
 d     =      [0-9]
 %%
 
@@ -66,13 +66,13 @@ d     =      [0-9]
 "("             { return Token.T_lpar; }
 ")"             { return Token.T_rpar; }
 "+"             { return Token.T_plus; }
-"-"             { return Token.T_minus; }
+
 "*"             { return Token.T_times; }
 "div"           { return Token.T_div; }
 "mod"           { return Token.T_mod; }
 
-{l}+            { return Token.T_id; }
-{d}+            { return Token.T_num; }
-
+{l}+           { return Token.T_id; }
+{d}+           { return Token.T_num; }
+"-"             { return Token.T_minus; }
 {ws}            {}
 \'.*\n          {}
