@@ -36,7 +36,7 @@ public static class Token {
 
 %}
 
-delim =      [ \t\n]
+delim =      [ \t\r\n]
 ws    =      {delim}+
 l     =      [A-Za-z]
 d     =      [0-9]
