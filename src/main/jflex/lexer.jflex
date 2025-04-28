@@ -35,6 +35,7 @@ public static class Token {
         public static final int T_fun     = 20;
         public static final int T_return  = 21;
         public static final int T_var     = 22;
+        public static final int T_char    = 23;
 
 };
 
@@ -66,13 +67,15 @@ d     =      [0-9]
 "("             { return Token.T_lpar; }
 ")"             { return Token.T_rpar; }
 "+"             { return Token.T_plus; }
-
+"-"             { return Token.T_minus; }
 "*"             { return Token.T_times; }
 "div"           { return Token.T_div; }
 "mod"           { return Token.T_mod; }
 
+\'([^\'\\]|\\[ntr0\'\"\\]|\\x[0-9a-fA-F]{2})\'   { return Token.T_char; } 
+
 {l}+           { return Token.T_id; }
 {d}+           { return Token.T_num; }
-"-"             { return Token.T_minus; }
+
 {ws}            {}
-\'.*\n          {}
+\.*\n          {}
