@@ -73,6 +73,8 @@ d     =      [0-9]
 "mod"           { return Token.T_mod; }
 
 \'([^\'\\]|\\[ntr0\'\"\\]|\\x[0-9a-fA-F]{2})\'   { return Token.T_char; } 
+\"([^\"\\n\\]|\\.)*\"                            { return Token.T_char; }
+
 
 {l}+           { return Token.T_id; }
 {d}+           { return Token.T_num; }
