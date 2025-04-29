@@ -46,6 +46,11 @@ public static class Token {
         public static final int T_ClBr = 30 ;
         public static final int T_OpCuBr = 31 ;
         public static final int T_ClCuBr = 32 ;
+        public static final int T_BigEq = 33 ;
+        public static final int T_SmEQ = 34 ;
+        public static final int T_Bigger = 35 ;
+        public static final int T_Smaller = 36;
+        public static final int T_Insert = 37 ;
 };
 
 
@@ -83,6 +88,11 @@ d     =      [0-9]
 "]"             { return Token.T_ClBr; }
 "{"             { return Token.T_OpCuBr; }
 "}"             { return Token.T_ClCuBr; }
+"<="            { return Token.T_SmEQ; }
+">="            { return Token.T_BigEq; }
+"<-"            { return Token.T_Insert; }
+"<"             { return Token.T_Smaller; }
+">"             { return Token.T_Bigger; }
 "="             { return Token.T_eq; }
 "("             { return Token.T_lpar; }
 ")"             { return Token.T_rpar; }
