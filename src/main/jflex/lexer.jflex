@@ -10,6 +10,7 @@ import java_cup.runtime.Symbol;
 %integer
 %line
 %column
+%state COMMENT
 %{
 
 public static class Token {
@@ -36,7 +37,7 @@ public static class Token {
         public static final int T_return  = 21;
         public static final int T_var     = 22;
         public static final int T_char    = 23;
-
+        public static final int T_comment = 24;
 };
 
 
@@ -47,6 +48,12 @@ ws    =      {delim}+
 l     =      [A-Za-z][A-Za-z0-9_-]*
 d     =      [0-9]
 %%
+
+
+
+\$\$([^$]|\$[^$])*\$\$   { /* skip block comment */ }
+\$[^\n]*                 { /* skip rest of this line */ }
+
 
 "if"            { return Token.T_if; }
 "then"          { return Token.T_then; }
@@ -60,8 +67,6 @@ d     =      [0-9]
 "var"           { return Token.T_var; }
 "nothing"       { return Token.T_nothing; }
 "fun"           { return Token.T_fun; }
-
-
 
 "="             { return Token.T_eq; }
 "("             { return Token.T_lpar; }

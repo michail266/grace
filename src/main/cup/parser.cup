@@ -15,3 +15,5 @@ factor ::= factor T_times term
 term  ::= T_num
         | T_lpar expr T_rpar
         ;
+
+expr
