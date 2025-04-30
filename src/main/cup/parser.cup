@@ -1,5 +1,6 @@
 import java_cup.runtime.Symbol;
-import java_cup.runtime.*;
+import java.util.Map;
+
 
 terminal T_if, T_then, T_else, T_not, T_nothing, T_or, T_ref, T_do;
 terminal T_id, T_num, T_lpar, T_rpar, T_plus, T_minus, T_times, T_div, T_mod;

@@ -7,11 +7,9 @@ import java_cup.runtime.Symbol;
 
 %class Lexer
 %unicode
-%integer
 %line
 %column
-%state COMMENT
-%{
+%cup
 
 public static class Token {
         public static final int T_if      = 1;
@@ -51,10 +49,11 @@ public static class Token {
         public static final int T_Bigger = 35 ;
         public static final int T_Smaller = 36;
         public static final int T_Insert = 37 ;
+        public static fianl int T_hashtag = 28 ;
 };
 
 
-%}
+%
 
 delim =      [ \t\r\n]
 ws    =      {delim}+
@@ -81,6 +80,7 @@ d     =      [0-9]
 "nothing"       { return Token.T_nothing; }
 "fun"           { return Token.T_fun; }
 ":"             { return Token.T_colon;}
+"#"             { return Token.T_hashtag;}
 ";"             { return Token.T_semicolon;}
 ","             { return Token.T_coma; }
 "."             { return Token.T_dot; }
