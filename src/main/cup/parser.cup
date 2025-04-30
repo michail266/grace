@@ -27,7 +27,9 @@ exprs ::= exprs expr
        ;
 
 expr ::= expr:e1 T_plus expr:e2           {: RESULT = e1 + e2; :}
+       //| expr:e1 T_minus expr:e2          {: RESULT = e1 - e2; :}
        | expr:e1 T_times expr:e2          {: RESULT = e1 * e2; :}
+       //| expr:e1 T_div expr:e2            {: RESULT = e1 / e2; :}
        | T_num:n                          {: RESULT = n; :}
        | T_id:v                           {: RESULT = mem.get(v); :}  
        | T_lpar expr:e1 T_rpar            {: RESULT = e1; :}
