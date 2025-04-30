@@ -36,6 +36,7 @@ public static class Token {
         public static final int T_return  = 21;
         public static final int T_var     = 22;
         public static final int T_char    = 23;
+        public static final int T_string  = 24;
 
 };
 
@@ -73,7 +74,7 @@ d     =      [0-9]
 "mod"           { return Token.T_mod; }
 
 \'([^\'\\]|\\[ntr0\'\"\\]|\\x[0-9a-fA-F]{2})\'   { return Token.T_char; } 
-\"([^\"\\n\\]|\\.)*\"                            { return Token.T_char; }
+\"([^\"\\n\\]|\\.)*\"                            { return Token.T_string; }
 
 
 {l}+           { return Token.T_id; }
