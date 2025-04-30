@@ -16,6 +16,8 @@ import java_cup.runtime.Symbol;
 %eofval}
 
 %{
+    private StringBuffer sb = new StringBuffer();
+
     private Symbol createSymbol(int type) {
         return new Symbol(type, yyline + 1, yycolumn + 1);
     }
@@ -74,5 +76,5 @@ d     =      [0-9]
 {l}+           { return createSymbol(Symbols.T_id, yytext()); }
 {d}+           { return createSymbol(Symbols.T_num, Integer.valueOf(yytext())); }
 
-{ws}            {}
+{ws}           {}
 \.*\n          {}
