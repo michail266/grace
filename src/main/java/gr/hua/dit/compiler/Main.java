@@ -1,6 +1,8 @@
 package gr.hua.dit.compiler;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 public class Main {
 
