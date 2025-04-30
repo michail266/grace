@@ -10,7 +10,8 @@ public class Main {
     Parser p = new Parser(l);
 
     try {
-      Object result = p.parse().value;
+      Object result = (Integer) p.parse().value;
+      System.out.println("Value is:"+result);
     } catch(Exception e) {
       System.err.println("Error: " + e.getMessage());
     }
