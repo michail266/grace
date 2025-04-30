@@ -1,6 +1,9 @@
 import java_cup.runtime.Symbol;
+import java_cup.runtime.*;
 
-terminal T_plus, T_times, T_lpar, T_rpar, T_num;
+terminal T_if, T_then, T_else, T_not, T_nothing, T_or, T_ref, T_do;
+terminal T_id, T_num, T_lpar, T_rpar, T_plus, T_minus, T_times, T_div, T_mod;
+terminal T_eq, T_and, T_fun, T_return, T_var, T_char, T_string;
 non terminal expr, factor, term;
 
 start with expr;
