@@ -58,7 +58,7 @@ d     =      [0-9]
 "<-"            { return createSymbol(Symbols.T_Insert); }
 "<"             { return createSymbol(Symbols.T_Smaller); }
 ">"             { return createSymbol(Symbols.T_Bigger); }
-"="             { return createSymbol(Symbols.T_eq); }
+"="             { return createSymbol(Symbols.T_assign); }
 "("             { return createSymbol(Symbols.T_lpar); }
 ")"             { return createSymbol(Symbols.T_rpar); }
 "+"             { return createSymbol(Symbols.T_plus); }
@@ -66,6 +66,7 @@ d     =      [0-9]
 "*"             { return createSymbol(Symbols.T_times); }
 "div"           { return createSymbol(Symbols.T_div); }
 "mod"           { return createSymbol(Symbols.T_mod); }
+"print"         { return createSymbol(Symbols.T_print); }
 
 // String literal: double-quoted, with simple escapes
 \"([^\"\\]|\\.)*\"    { return createSymbol(Symbols.T_char); }

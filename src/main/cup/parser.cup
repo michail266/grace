@@ -6,7 +6,7 @@ parser code{:
        Map<String,Integer> mem = new HashMap<String,Integer>();
 :}
 
-terminal T_plus, T_times, T_lpar, T_rpar,  T_if, T_then, T_else, T_assign, T_print, T_coma, T_minus, T_dot, T_colon, T_semicolon, T_Smaller, T_eq, T_Bigger, T_OpBr, T_ClBr, T_OpCuBr, T_ClCuBr, T_char, T_Insert, T_SmEQ, T_BigEq, T_do, T_or, T_and, T_div, T_fun, T_mod, T_not, T_ref, T_var, T_return, T_nothing;
+terminal T_plus, T_times, T_lpar, T_rpar,  T_if, T_then, T_else, T_assign, T_print, T_coma, T_minus, T_dot, T_colon, T_semicolon, T_Smaller, T_Bigger, T_OpBr, T_ClBr, T_OpCuBr, T_ClCuBr, T_char, T_Insert, T_SmEQ, T_BigEq, T_do, T_or, T_and, T_div, T_fun, T_mod, T_not, T_ref, T_var, T_return, T_nothing;
 terminal Integer T_num;
 terminal String T_id;
 
