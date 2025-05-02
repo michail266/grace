@@ -42,7 +42,7 @@ expr ::= expr:e1 T_plus expr:e2           {: RESULT = e1 + e2; :}
 
 stmt ::= T_id:v T_assign expr:e           {: mem.put(v, e); :}
        | T_print expr:e                   {: System.out.println(e); :}
-       |T_if expr:cond T_then stmt:thenstmt T_else stmt:elsestmt {: RESULT = (cond != 0) ? thenstmt : elsestmt; :}
+       |T_if expr:cond T_then stmt:thenstmt T_else stmt:elsestmt      {: System.out.println("our condition is" + cond ); :}
        ;
 
 stmts ::= stmts stmt
