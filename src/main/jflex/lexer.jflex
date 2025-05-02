@@ -64,15 +64,11 @@ d     =      [0-9]
 "+"             { return createSymbol(Symbols.T_plus); }
 "-"             { return createSymbol(Symbols.T_minus); }
 "*"             { return createSymbol(Symbols.T_times); }
+"'"             { return createSymbol(Symbols.T_SiQu); }    
+"\""             { return createSymbol(Symbols.T_DoQu); }
 "div"           { return createSymbol(Symbols.T_div); }
 "mod"           { return createSymbol(Symbols.T_mod); }
 "print"         { return createSymbol(Symbols.T_print); }
-
-// String literal: double-quoted, with simple escapes
-\"([^\"\\]|\\.)*\"    { return createSymbol(Symbols.T_char); }
-
-// Character literal
-\'([^\'\\]|\\.)\'     { return createSymbol(Symbols.T_char); }
 
 {l}+           { return createSymbol(Symbols.T_id, yytext()); }
 {d}+           { return createSymbol(Symbols.T_num, Integer.valueOf(yytext())); }
