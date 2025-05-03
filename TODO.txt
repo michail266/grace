@@ -1,5 +1,2 @@
 fun
-
-
-var 
-print String #kapos
+var
