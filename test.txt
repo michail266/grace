@@ -1,0 +1,4 @@
+print 6
+print 8
+if 2 then print 1
+if 2 then print 1 else print 2

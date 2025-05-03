@@ -28,7 +28,7 @@ import java_cup.runtime.Symbol;
 %}
 
 delim =      [ \t\r\n]
-ws    =      {delim}+
+ws    =      {delim}
 l     =      [A-Za-z][A-Za-z0-9_-]*
 d     =      [0-9]
 %%
@@ -65,13 +65,14 @@ d     =      [0-9]
 "-"             { return createSymbol(Symbols.T_minus); }
 "*"             { return createSymbol(Symbols.T_times); }
 "'"             { return createSymbol(Symbols.T_SiQu); }    
-"\""             { return createSymbol(Symbols.T_DoQu); }
+"\""            { return createSymbol(Symbols.T_DoQu); }
 "div"           { return createSymbol(Symbols.T_div); }
 "mod"           { return createSymbol(Symbols.T_mod); }
 "print"         { return createSymbol(Symbols.T_print); }
 
-{l}+           { return createSymbol(Symbols.T_id, yytext()); }
-{d}+           { return createSymbol(Symbols.T_num, Integer.valueOf(yytext())); }
 
-{ws}           {}
-\.*\n          {}
+{d}+            { return createSymbol(Symbols.T_num, Integer.valueOf(yytext())); }
+{l}+            { return createSymbol(Symbols.T_id, yytext()); }
+
+{ws}            {}
+\'.*\n          {}
