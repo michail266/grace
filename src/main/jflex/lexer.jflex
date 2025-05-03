@@ -69,8 +69,9 @@ d     =      [0-9]
 "\""            { return createSymbol(Symbols.T_DoQu); }
 "div"           { return createSymbol(Symbols.T_div); }
 "mod"           { return createSymbol(Symbols.T_mod); }
-"print"         { return createSymbol(Symbols.T_print); }
 "prints"        { return createSymbol(Symbols.T_prints); }
+"print"         { return createSymbol(Symbols.T_print); }
+
 
 
 {d}+            { return createSymbol(Symbols.T_num, Integer.valueOf(yytext())); }

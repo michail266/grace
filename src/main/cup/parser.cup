@@ -35,8 +35,8 @@ stmts ::= stmts stmt
 stmt ::= T_id:v T_assign expr:e                  {: mem.put(v, e); :}
        | T_id T_assign strings   
        | T_return expr:e                         {: System.out.println(e); :}
-       | T_print expr:e                          {: System.out.println(e); :}
-       | T_prints string                       
+       | T_prints string
+       | T_print expr:e                          {: System.out.println(e); :}        
        | if_expr 
        | while_expr
        ;
