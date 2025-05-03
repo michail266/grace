@@ -33,8 +33,8 @@ stmt ::= T_id:v T_assign expr:e           {: mem.put(v, e); :}
        | if_expr 
        ;
 
-if_expr ::=T_if expr:cond T_then stmt:th                {: System.out.println("our condition is " + cond ); :}
-       | T_if expr:cond T_then stmt:th T_else stmt:el   {: System.out.println("our condition is " + cond ); :}
+if_expr ::=T_if expr:cond T_then stmt:th                {: System.out.println("Our condition is " + cond + " and our context is " + th ); :}
+       | T_if expr:cond T_then stmt:th T_else stmt:el   {: System.out.println("Our condition is " + cond + " and our context is " + th + " and " + el ); :}
        ;
 
 expr ::= expr:e1 T_plus expr:e2           {: RESULT = e1 + e2; :}

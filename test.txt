@@ -4,3 +4,4 @@ if 2 then print 1
 if 2 then print 1 else print 2
 x=69
 print x
+if 2 then if 3 then print 2 else print 3
