@@ -37,6 +37,7 @@ d     =      [0-9]
 "then"          { return createSymbol(Symbols.T_then); }
 "else"          { return createSymbol(Symbols.T_else); }
 "and"           { return createSymbol(Symbols.T_and); }
+"while"         { return createSymbol(Symbols.T_while); }
 "do"            { return createSymbol(Symbols.T_do); }
 "not"           { return createSymbol(Symbols.T_not); }
 "or"            { return createSymbol(Symbols.T_or); }
@@ -69,6 +70,7 @@ d     =      [0-9]
 "div"           { return createSymbol(Symbols.T_div); }
 "mod"           { return createSymbol(Symbols.T_mod); }
 "print"         { return createSymbol(Symbols.T_print); }
+"prints"         { return createSymbol(Symbols.T_prints); }
 
 
 {d}+            { return createSymbol(Symbols.T_num, Integer.valueOf(yytext())); }

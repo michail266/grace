@@ -1,5 +1,5 @@
 fun
-return
-while do
+
+
 var 
-print String
+print String #kapos

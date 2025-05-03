@@ -4,19 +4,22 @@ import java.util.HashMap;
 
 parser code{:
        Map<String,Integer> mem = new HashMap<String,Integer>();
+       Map<String,String> mems = new HashMap<String,String>();
 :}
 
-terminal T_plus, T_times, T_lpar, T_rpar,  T_if, T_then, T_else, T_assign, T_print, T_coma, T_minus, T_dot, T_colon, T_semicolon, T_Smaller, T_Bigger, T_OpBr, T_ClBr, T_OpCuBr, T_ClCuBr, T_Insert, T_SmEQ, T_BigEq, T_do, T_or, T_and, T_div, T_fun, T_mod, T_not, T_ref, T_var, T_return, T_nothing, T_DoQu ,T_SiQu ;
+terminal T_plus, T_times, T_lpar, T_rpar,  T_if, T_then, T_else, T_assign, T_print, T_prints, T_coma, T_minus, T_while, T_dot, T_colon, T_semicolon, T_Smaller, T_Bigger, T_OpBr, T_ClBr, T_OpCuBr, T_ClCuBr, T_Insert, T_SmEQ, T_BigEq, T_do, T_or, T_and, T_div, T_fun, T_mod, T_not, T_ref, T_var, T_return, T_nothing, T_DoQu ,T_SiQu;
 terminal Integer T_num;
 terminal String T_id ;
 
 
-non terminal exprs, factor, term, stmt, stmts, if_expr;
-non terminal Integer expr ;
+non terminal stmt, stmts, if_expr, while_expr;
+non terminal Integer expr;
+non terminal String strings, string, char;
 
 precedence left T_plus , T_minus;
 precedence left T_times , T_div;
 precedence left T_else ;
+precedence left T_SiQu , T_BigEq;
 
 /*
 sss
@@ -28,13 +31,20 @@ stmts ::= stmts stmt
        | stmt
        ;
 
-stmt ::= T_id:v T_assign expr:e           {: mem.put(v, e); :}
-       | T_print expr:e                   {: System.out.println(e); :}
+stmt ::= T_id:v T_assign expr:e                  {: mem.put(v, e); :}
+       | T_id T_assign strings   
+       | T_return expr:e                         {: System.out.println(e); :}
+       | T_print expr:e                          {: System.out.println(e); :}
+       | T_prints string                       
        | if_expr 
+       | while_expr
        ;
 
 if_expr ::=T_if expr:cond T_then stmt:th                {: System.out.println("Our condition is " + cond + " and our context is " + th ); :}
        | T_if expr:cond T_then stmt:th T_else stmt:el   {: System.out.println("Our condition is " + cond + " and our context is " + th + " and " + el ); :}
+       ;
+
+while_expr ::=T_while expr:cond T_do stmt:th            {:System.out.println(th);  :}
        ;
 
 expr ::= expr:e1 T_plus expr:e2           {: RESULT = e1 + e2; :}
@@ -42,12 +52,20 @@ expr ::= expr:e1 T_plus expr:e2           {: RESULT = e1 + e2; :}
        | expr:e1 T_times expr:e2          {: RESULT = e1 * e2; :}
        | expr:e1 T_div expr:e2            {: RESULT = e1 / e2; :}
        | T_num:n                          {: RESULT = n; :}
-       | T_id:v                           {: RESULT = mem.get(v); :}  
+       | T_id:v                           {: RESULT = mem.get(v); :}
        | T_lpar expr:e1 T_rpar            {: RESULT = e1; :}
        | T_SiQu expr:e1 T_SiQu            {: RESULT = e1; :}
        | T_DoQu expr:e1 T_DoQu            {: RESULT = e1; :}
        ;
 
+strings ::=   T_SiQu char T_SiQu
+       |      T_BigEq string T_BigEq
+       ;
 
+char ::= T_id
+       ;
+
+string ::= T_id
+       ;
 
 
