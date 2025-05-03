@@ -70,11 +70,15 @@ d     =      [0-9]
 "div"           { return createSymbol(Symbols.T_div); }
 "mod"           { return createSymbol(Symbols.T_mod); }
 "print"         { return createSymbol(Symbols.T_print); }
-"prints"         { return createSymbol(Symbols.T_prints); }
+"prints"        { return createSymbol(Symbols.T_prints); }
 
 
 {d}+            { return createSymbol(Symbols.T_num, Integer.valueOf(yytext())); }
 {l}+            { return createSymbol(Symbols.T_id, yytext()); }
+
+
+\$.*            {}
+"$$"([^$]|\$[^\$])*"$$"      {}
 
 {ws}            {}
 \'.*\n          {}

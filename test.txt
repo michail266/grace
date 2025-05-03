@@ -1,7 +1,11 @@
-print 6
-print 8
+print 6 
+print 8 $ This is a comment
 if 2 then print 1
 if 2 then print 1 else print 2
+$$ 
+This is
+also a comment
+$$
 x=69
 print x
 if 2 then if 3 then print 2 else print 3
@@ -9,3 +13,4 @@ y='hey'
 y="hey"
 prints y
 while 4 do print 6 print 7
+print 2 < 5
