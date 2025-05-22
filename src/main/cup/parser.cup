@@ -15,7 +15,7 @@ terminal Integer T_num;
 terminal String T_id ;
 
 
-non terminal stmt, stmts, if_expr, while_expr;
+non terminal Statement stmt, stmts, if_expr, while_expr;
 non terminal Expr expr, bool_expr;
 non terminal String strings, string, char;
 
@@ -39,14 +39,13 @@ stmt ::= T_id:v T_assign expr:e                  {:RESULT = new AssignStatement(
        | T_id T_assign strings   
        | T_return expr:e                         {: System.out.println(e); :}
        | T_prints string
-       | T_print expr:e                          {: System.out.println(e); :}        
+       | T_print expr:e                          {:RESULT = new PrintStatement(e);:} 
+       | T_if expr:c T_then stmt:t T_else stmt:e  {: RESULT = new IfStatement(c,t,e); :}       
        | if_expr 
        | while_expr
        ;
 
-if_expr ::=T_if expr:cond T_then stmt:th                {: System.out.println("Our condition is " + cond + " and our context is " + th ); :}
-       | T_if expr:cond T_then stmt:th T_else stmt:el   {: System.out.println("Our condition is " + cond + " and our context is " + th + " and " + el ); :}
-       ;
+
 
 while_expr ::=T_while expr:cond T_do stmts           
        ;
