@@ -7,72 +7,79 @@ import java_cup.runtime.Symbol;
 
 %class Lexer
 %unicode
-%integer
 %line
 %column
+%cup
+
+%eofval{
+    return createSymbol(Symbols.EOF);
+%eofval}
+
 %{
+    private StringBuffer sb = new StringBuffer();
 
-public static class Token {
-        public static final int T_if      = 1;
-        public static final int T_then    = 2;
-        public static final int T_else    = 3;
-        public static final int T_not     = 4;
-        public static final int T_nothing = 5;
-        public static final int T_or      = 6;
-        public static final int T_ref     = 7;
-        public static final int T_do      = 8;
-        public static final int T_id      = 9;
-        public static final int T_num     = 10;
-        public static final int T_lpar    = 11;
-        public static final int T_rpar    = 12;
-        public static final int T_plus    = 13;
-        public static final int T_minus   = 14;
-        public static final int T_times   = 15;
-        public static final int T_div     = 16;
-        public static final int T_mod     = 17;
-        public static final int T_eq      = 18;
-        public static final int T_and     = 19;
-        public static final int T_fun     = 20;
-        public static final int T_return  = 21;
-        public static final int T_var     = 22;
+    private Symbol createSymbol(int type) {
+        return new Symbol(type, yyline + 1, yycolumn + 1);
+    }
 
-};
-
-
+    private Symbol createSymbol(int type, Object value) {
+        return new Symbol(type, yyline + 1, yycolumn + 1, value);
+    }
 %}
 
 delim =      [ \t\r\n]
-ws    =      {delim}+
+ws    =      {delim}
 l     =      [A-Za-z][A-Za-z0-9_-]*
 d     =      [0-9]
 %%
 
-"if"            { return Token.T_if; }
-"then"          { return Token.T_then; }
-"else"          { return Token.T_else; }
-"and"           { return Token.T_and; }
-"do"            { return Token.T_do; }
-"not"           { return Token.T_not; }
-"or"            { return Token.T_or; }
-"ref"           { return Token.T_ref; }
-"return"        { return Token.T_return; }
-"var"           { return Token.T_var; }
-"nothing"       { return Token.T_nothing; }
-"fun"           { return Token.T_fun; }
+"if"            { return createSymbol(Symbols.T_if); }
+"then"          { return createSymbol(Symbols.T_then); }
+"else"          { return createSymbol(Symbols.T_else); }
+"and"           { return createSymbol(Symbols.T_and); }
+"while"         { return createSymbol(Symbols.T_while); }
+"do"            { return createSymbol(Symbols.T_do); }
+"not"           { return createSymbol(Symbols.T_not); }
+"or"            { return createSymbol(Symbols.T_or); }
+"ref"           { return createSymbol(Symbols.T_ref); }
+"return"        { return createSymbol(Symbols.T_return); }
+"var"           { return createSymbol(Symbols.T_var); }
+"nothing"       { return createSymbol(Symbols.T_nothing); }
+"fun"           { return createSymbol(Symbols.T_fun); }
+":"             { return createSymbol(Symbols.T_colon); }
+";"             { return createSymbol(Symbols.T_semicolon); }
+","             { return createSymbol(Symbols.T_coma); }
+"."             { return createSymbol(Symbols.T_dot); }
+"["             { return createSymbol(Symbols.T_OpBr); }
+"]"             { return createSymbol(Symbols.T_ClBr); }
+"{"             { return createSymbol(Symbols.T_OpCuBr); }
+"}"             { return createSymbol(Symbols.T_ClCuBr); }
+"<="            { return createSymbol(Symbols.T_SmEQ); }
+">="            { return createSymbol(Symbols.T_BigEq); }
+"<-"            { return createSymbol(Symbols.T_Insert); }
+"<"             { return createSymbol(Symbols.T_Smaller); }
+">"             { return createSymbol(Symbols.T_Bigger); }
+"="             { return createSymbol(Symbols.T_assign); }
+"("             { return createSymbol(Symbols.T_lpar); }
+")"             { return createSymbol(Symbols.T_rpar); }
+"+"             { return createSymbol(Symbols.T_plus); }
+"-"             { return createSymbol(Symbols.T_minus); }
+"*"             { return createSymbol(Symbols.T_times); }
+"'"             { return createSymbol(Symbols.T_SiQu); }    
+"\""            { return createSymbol(Symbols.T_DoQu); }
+"div"           { return createSymbol(Symbols.T_div); }
+"mod"           { return createSymbol(Symbols.T_mod); }
+"prints"        { return createSymbol(Symbols.T_prints); }
+"print"         { return createSymbol(Symbols.T_print); }
 
 
 
-"="             { return Token.T_eq; }
-"("             { return Token.T_lpar; }
-")"             { return Token.T_rpar; }
-"+"             { return Token.T_plus; }
+{d}+            { return createSymbol(Symbols.T_num, Integer.valueOf(yytext())); }
+{l}+            { return createSymbol(Symbols.T_id, yytext()); }
 
-"*"             { return Token.T_times; }
-"div"           { return Token.T_div; }
-"mod"           { return Token.T_mod; }
 
-{l}+           { return Token.T_id; }
-{d}+           { return Token.T_num; }
-"-"             { return Token.T_minus; }
+\$.*            {}
+"$$"([^$]|\$[^\$])*"$$"      {}
+
 {ws}            {}
 \'.*\n          {}
