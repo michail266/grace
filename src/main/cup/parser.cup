@@ -14,10 +14,11 @@ terminal T_plus, T_times, T_lpar, T_rpar,  T_if, T_then, T_else, T_assign, T_pri
 terminal Integer T_num;
 terminal String T_id ;
 
-
-non terminal Statement stmt, stmts, if_expr, while_expr;
+non terminal List<Statement> stmts;
+non terminal Statement stmt, if_expr, while_expr;
 non terminal Expr expr, bool_expr;
 non terminal String strings, string, char;
+non terminal Program program;
 
 precedence left T_plus , T_minus;
 precedence left T_times , T_div;
@@ -29,11 +30,11 @@ precedence left T_SiQu , T_DoQu;
 sss
 */
 
-start with stmts;
+start with program;
 
-stmts ::= stmts stmt
-       | stmt
-       ;
+stmts ::= stmts:ss stmt:s                         {: RESULT = ss; RESULT.add(s);  :}
+        | stmt:s                                  {: RESULT = new LinkedList<Statement>(); RESULT.add(s); :}
+        ;
 
 stmt ::= T_id:v T_assign expr:e                  {:RESULT = new AssignStatement(v, e); :}
        | T_id T_assign strings   
@@ -73,4 +74,5 @@ char ::= T_id
 string ::= T_id
        ;
 
-
+program ::= stmts:s                               {: RESULT = new Program(s); :}
+        ;
