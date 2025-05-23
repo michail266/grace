@@ -1,9 +1,10 @@
 
 package gr.hua.dit.compiler.ast;
 
+import gr.hua.dit.compiler.Symbol.SymbolEntry;
+import gr.hua.dit.compiler.Symbol.SymbolTable;
 import gr.hua.dit.compiler.errors.SemanticException;
 import gr.hua.dit.compiler.errors.TypeException;
-import gr.hua.dit.compiler.Symbol.*;
 
 public class Id extends Expr {
   private String name;

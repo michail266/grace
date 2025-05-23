@@ -14,10 +14,15 @@ parser code{:
        Map<String,String> mems = new HashMap<String,String>();
 :}
 
-terminal T_plus, T_times, T_lpar, T_rpar,  T_if, T_then, T_else, T_assign,T_let, T_print, T_prints, T_coma, T_minus, T_while, T_dot, T_colon, T_semicolon, T_Smaller, T_Bigger, T_OpBr, T_ClBr, T_OpCuBr, T_ClCuBr, T_Insert, T_SmEQ, T_BigEq, T_do, T_or, T_and, T_div, T_fun, T_mod, T_not, T_ref, T_var, T_return, T_nothing, T_DoQu ,T_SiQu;
+terminal T_plus, T_times, T_lpar, T_rpar,  T_if, T_then, T_else, T_int, T_char ;
+terminal T_assign,T_let, T_print, T_prints, T_coma ;
+terminal T_minus, T_while, T_dot, T_colon, T_semicolon, T_Smaller, T_Bigger, T_OpBr;
+terminal T_ClBr, T_OpCuBr, T_ClCuBr, T_Insert, T_SmEQ, T_BigEq, T_do, T_or, T_and, T_div ;
+terminal T_fun, T_mod, T_not, T_ref, T_var, T_return, T_nothing, T_DoQu ,T_SiQu;
 terminal Integer T_num;
 terminal String T_id ;
 
+non terminal java.util.List<Stmt> stmt_list;
 non terminal Statement stmt, if_expr, while_expr;
 non terminal Expr expr, bool_expr;
 non terminal String strings, string, char;
@@ -29,10 +34,16 @@ precedence left T_plus , T_minus;
 precedence left T_times , T_div;
 precedence left T_else , T_do;
 
- stmt:s                                  {: RESULT = new LinkedList<Statement>(); RESULT.add(s); :}
+start with program;
+
+program ::= decl_list:decls stmt_list:lst            {: RESULT = new Program(decls,lst); :}
+      ;
+
+stmt_list ::=                                      {: RESULT = new LinkedList<Stmt>(); :}      
+        |  stmt_list:sl stmt:s                     {: sl.add(s); RESULT = sl; :}
         ;
 
-stmt ::= | T_let T_id:id T_assign expr:e                 {: RESULT = new Let(id, e); :}
+stmt ::= T_let T_id:id T_assign expr:e                 {: RESULT = new Let(id, e); :}
          | T_id T_assign strings   
          | T_return expr:e                         {: System.out.println(e); :}
          | T_prints string
@@ -40,6 +51,7 @@ stmt ::= | T_let T_id:id T_assign expr:e                 {: RESULT = new Let(id,
          | T_if expr:c T_then stmt:t T_else stmt:e  {: RESULT = new IfStatement(c,t,e); :}       
          | if_expr 
          | while_expr
+         | T_lpar expr:e1 T_rpar       {: RESULT = e1; :}
          ;
 
 
@@ -47,14 +59,24 @@ stmt ::= | T_let T_id:id T_assign expr:e                 {: RESULT = new Let(id,
 while_expr ::=T_while expr:cond T_do stmt_list            
        ;
 
-expr ::= expr:e1 T_plus expr:e2      {: RESULT = new BinOp(BinOp.Operator.Plus, e1,re); :}
-       | expr:e1 T_times expr:e2     {:  RESULT = new BinOp(BinOp.Operator.Times, e1,re); :}
+expr ::= expr:e1 T_plus expr:e2      {: RESULT = new BinOp(BinOp.Operator.Plus, e1,e2); :}
+       | expr:e1 T_times expr:e2     {:  RESULT = new BinOp(BinOp.Operator.Times, e1,e2); :}
        | expr:e1 T_div expr:re        {: RESULT = new BinOp(BinOp.Operator.Div, e1,re); :}
-       | T_num:n                     {: RESULT = new NumConst(num); :}
-       | T_id:v                      {: RESULT = new Id(id);  :}
+       | T_num:n                     {: RESULT = new NumConst(n); :}
+       | T_id:v                     {: RESULT = new Id(v);  :}
        | T_lpar expr:e1 T_rpar       {: RESULT = e1; :}
        ;
 
 type ::= T_int                            {:RESULT = BasicType.Int; :}
        | T_char                           {:RESULT = BasicType.Char :}
+       ;
+
+strings ::=   T_SiQu char T_SiQu
+       |      T_DoQu string T_DoQu
+       ;
+
+char ::= T_id
+       ;
+       
+String ::=T_id
        ;
