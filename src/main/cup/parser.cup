@@ -10,7 +10,7 @@ parser code{:
        Map<String,String> mems = new HashMap<String,String>();
 :}
 
-terminal T_plus, T_times, T_lpar, T_rpar,  T_if, T_then, T_else, T_assign, T_print, T_prints, T_coma, T_minus, T_while, T_dot, T_colon, T_semicolon, T_Smaller, T_Bigger, T_OpBr, T_ClBr, T_OpCuBr, T_ClCuBr, T_Insert, T_SmEQ, T_BigEq, T_do, T_or, T_and, T_div, T_fun, T_mod, T_not, T_ref, T_var, T_return, T_nothing, T_DoQu ,T_SiQu;
+terminal T_plus, T_times, T_lpar, T_rpar,  T_if, T_then, T_else, T_assign,T_let, T_print, T_prints, T_coma, T_minus, T_while, T_dot, T_colon, T_semicolon, T_Smaller, T_Bigger, T_OpBr, T_ClBr, T_OpCuBr, T_ClCuBr, T_Insert, T_SmEQ, T_BigEq, T_do, T_or, T_and, T_div, T_fun, T_mod, T_not, T_ref, T_var, T_return, T_nothing, T_DoQu ,T_SiQu;
 terminal Integer T_num;
 terminal String T_id ;
 
@@ -36,7 +36,8 @@ stmts ::= stmts:ss stmt:s                         {: RESULT = ss; RESULT.add(s);
         | stmt:s                                  {: RESULT = new LinkedList<Statement>(); RESULT.add(s); :}
         ;
 
-stmt ::= T_id:v T_assign expr:e                  {:RESULT = new AssignStatement(v, e); :}
+stmt ::= | T_let T_id:id T_assign expr:e                 {: RESULT = new Let(id, e); :}
+
        | T_id T_assign strings   
        | T_return expr:e                         {: System.out.println(e); :}
        | T_prints string
@@ -51,10 +52,11 @@ stmt ::= T_id:v T_assign expr:e                  {:RESULT = new AssignStatement(
 while_expr ::=T_while expr:cond T_do stmts           
        ;
 
-expr ::= expr:e1 T_plus expr:e2      {: RESULT = new PlusExpr(e1, e2); :}
-       | expr:e1 T_times expr:e2     {: RESULT = new TimesExpr(e1, e2); :}
-       | T_num:n                     {: RESULT = new NumExpr(n); :}
-       | T_id:v                      {: RESULT = new VarExpr(v); :}
+expr ::= expr:e1 T_plus expr:e2      {: RESULT = new BinOp(BinOp.Operator.Plus, e1,re); :}
+       | expr:e1 T_times expr:e2     {:  RESULT = new BinOp(BinOp.Operator.Times, e1,re); :}
+       | expr:e1 T_div expr:re        {: RESULT = new BinOp(BinOp.Operator.Div, e1,re); :}
+       | T_num:n                     {: RESULT = new NumConst(num); :}
+       | T_id:v                      {: RESULT = new Id(id);  :}
        | T_lpar expr:e1 T_rpar       {: RESULT = e1; :}
        ;
 
