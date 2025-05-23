@@ -14,7 +14,8 @@ terminal T_plus, T_times, T_lpar, T_rpar,  T_if, T_then, T_else, T_assign,T_let,
 terminal Integer T_num;
 terminal String T_id ;
 
-non terminal List<Statement> stmts;
+
+non terminal java.util.List<Stmt> stmt_list;
 non terminal Statement stmt, if_expr, while_expr;
 non terminal Expr expr, bool_expr;
 non terminal String strings, string, char;
@@ -32,20 +33,22 @@ sss
 
 start with program;
 
-stmts ::= stmts:ss stmt:s                         {: RESULT = ss; RESULT.add(s);  :}
-        | stmt:s                                  {: RESULT = new LinkedList<Statement>(); RESULT.add(s); :}
+program ::= decl_list:decls stmt_list:lst            {: RESULT = new Program(decls,lst); :}
+      ;
+
+stmt_list ::=                                      {: RESULT = new LinkedList<Stmt>(); :}      
+        |  stmt_list:sl stmt:s                     {: sl.add(s); RESULT = sl; :}
         ;
 
 stmt ::= | T_let T_id:id T_assign expr:e                 {: RESULT = new Let(id, e); :}
-
-       | T_id T_assign strings   
-       | T_return expr:e                         {: System.out.println(e); :}
-       | T_prints string
-       | T_print expr:e                          {:RESULT = new PrintStatement(e);:} 
-       | T_if expr:c T_then stmt:t T_else stmt:e  {: RESULT = new IfStatement(c,t,e); :}       
-       | if_expr 
-       | while_expr
-       ;
+         | T_id T_assign strings   
+         | T_return expr:e                         {: System.out.println(e); :}
+         | T_prints string
+         | T_print expr:e                          {:RESULT = new PrintStatement(e);:} 
+         | T_if expr:c T_then stmt:t T_else stmt:e  {: RESULT = new IfStatement(c,t,e); :}       
+         | if_expr 
+         | while_expr
+         ;
 
 
 
@@ -60,6 +63,10 @@ expr ::= expr:e1 T_plus expr:e2      {: RESULT = new BinOp(BinOp.Operator.Plus, 
        | T_lpar expr:e1 T_rpar       {: RESULT = e1; :}
        ;
 
+type ::= T_int                            {:RESULT = BasicType.Int; :}
+       | T_char                           {:RESULT = BasicType.Char :}
+       ;
+       
 bool_expr ::= expr T_SmEQ expr
        | expr T_BigEq expr
        | expr T_Smaller expr
@@ -75,6 +82,3 @@ char ::= T_id
 
 string ::= T_id
        ;
-
-program ::= stmts:s                               {: RESULT = new Program(s); :}
-        ;
