@@ -1,9 +1,13 @@
-import java_cup.runtime.Symbol;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.List;
 import java.util.LinkedList;
 
+import gr.hua.dit.compiler.types.*;
+import gr.hua.dit.compiler.errors.*;
+import gr.hua.dit.compiler.ast.*;
+import gr.hua.dit.compiler.Symbol.*;
+
+parser Parser;
+symbol Symbols;
 
 parser code{:
        Map<String,Integer> mem = new HashMap<String,Integer>();
@@ -14,30 +18,18 @@ terminal T_plus, T_times, T_lpar, T_rpar,  T_if, T_then, T_else, T_assign,T_let,
 terminal Integer T_num;
 terminal String T_id ;
 
-
-non terminal java.util.List<Stmt> stmt_list;
 non terminal Statement stmt, if_expr, while_expr;
 non terminal Expr expr, bool_expr;
 non terminal String strings, string, char;
+non terminal java.util.List<Decl> decl_list;
 non terminal Program program;
+
 
 precedence left T_plus , T_minus;
 precedence left T_times , T_div;
 precedence left T_else , T_do;
-precedence nonassoc T_SmEQ, T_BigEq, T_Smaller, T_Bigger;
-precedence left T_SiQu , T_DoQu;
 
-/*
-sss
-*/
-
-start with program;
-
-program ::= decl_list:decls stmt_list:lst            {: RESULT = new Program(decls,lst); :}
-      ;
-
-stmt_list ::=                                      {: RESULT = new LinkedList<Stmt>(); :}      
-        |  stmt_list:sl stmt:s                     {: sl.add(s); RESULT = sl; :}
+ stmt:s                                  {: RESULT = new LinkedList<Statement>(); RESULT.add(s); :}
         ;
 
 stmt ::= | T_let T_id:id T_assign expr:e                 {: RESULT = new Let(id, e); :}
@@ -52,7 +44,7 @@ stmt ::= | T_let T_id:id T_assign expr:e                 {: RESULT = new Let(id,
 
 
 
-while_expr ::=T_while expr:cond T_do stmts           
+while_expr ::=T_while expr:cond T_do stmt_list            
        ;
 
 expr ::= expr:e1 T_plus expr:e2      {: RESULT = new BinOp(BinOp.Operator.Plus, e1,re); :}
@@ -65,20 +57,4 @@ expr ::= expr:e1 T_plus expr:e2      {: RESULT = new BinOp(BinOp.Operator.Plus, 
 
 type ::= T_int                            {:RESULT = BasicType.Int; :}
        | T_char                           {:RESULT = BasicType.Char :}
-       ;
-       
-bool_expr ::= expr T_SmEQ expr
-       | expr T_BigEq expr
-       | expr T_Smaller expr
-       | expr T_Bigger expr
-       ;
-
-strings ::=   T_SiQu char T_SiQu
-       |      T_DoQu string T_DoQu
-       ;
-
-char ::= T_id
-       ;
-
-string ::= T_id
        ;

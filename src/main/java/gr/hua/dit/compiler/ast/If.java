@@ -1,8 +1,9 @@
+
 package gr.hua.dit.compiler.ast;
 
-import gr.hua.dit.compiler.types.*;
+import gr.hua.dit.compiler.Symbol.SymbolTable;
 import gr.hua.dit.compiler.errors.SemanticException;
-import gr.hua.dit.compiler.Symbol.*;
+import gr.hua.dit.compiler.types.BasicType;
 
 public class If extends Stmt {
   private Expr cond;
@@ -20,7 +21,7 @@ public class If extends Stmt {
   }
 
   public void sem(SymbolTable tbl) throws SemanticException {
-    cond.typeCheck(tbl, BasicType.Bool);
+    cond.typeCheck(tbl, BasicType.Int); //Treats non zero as true
     then_stmt.sem(tbl);
     if (else_stmt != null)
       else_stmt.sem(tbl);
