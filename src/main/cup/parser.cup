@@ -41,7 +41,7 @@ decl_list ::=                                     {: RESULT = new LinkedList<Dec
 
 
 
-decl ::= T_var T_id:id T_colon type:t               {: RESULT = new Decl(id,t); :}
+decl ::= T_var T_id:id T_colon type:t  T_semicolon            {: RESULT = new Decl(id,t); :}
       ;
 
 
@@ -53,7 +53,7 @@ stmt_list ::=                                      {: RESULT = new LinkedList<St
 
 
 
-stmt ::=  T_let T_id:id T_assign expr:e                 {: RESULT = new Let(id, e); :}
+stmt ::=  T_var T_id:id T_Insert expr:e  T_semicolon               {: RESULT = new Let(id, e); :}
          | T_id T_assign strings   
          | T_return expr:e                         {: System.out.println(e); :}
          | T_prints string
