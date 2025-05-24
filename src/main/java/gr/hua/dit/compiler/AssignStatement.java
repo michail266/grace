@@ -12,6 +12,6 @@ public class AssignStatement extends Statement {
   }
 
   public void execute() {
-    Memory.mem.put(variable, e.evaluate());
+    //Memory.mem.put(variable, e.evaluate());
   }
 }

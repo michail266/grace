@@ -1,18 +1,9 @@
 import java.util.List;
 import java.util.LinkedList;
-
 import gr.hua.dit.compiler.types.*;
 import gr.hua.dit.compiler.errors.*;
 import gr.hua.dit.compiler.ast.*;
 import gr.hua.dit.compiler.Symbol.*;
-
-parser Parser;
-symbol Symbols;
-
-parser code{:
-       Map<String,Integer> mem = new HashMap<String,Integer>();
-       Map<String,String> mems = new HashMap<String,String>();
-:}
 
 terminal T_plus, T_times, T_lpar, T_rpar,  T_if, T_then, T_else, T_int, T_char ;
 terminal T_assign,T_let, T_print, T_prints, T_coma ;
@@ -20,14 +11,17 @@ terminal T_minus, T_while, T_dot, T_colon, T_semicolon, T_Smaller, T_Bigger, T_O
 terminal T_ClBr, T_OpCuBr, T_ClCuBr, T_Insert, T_SmEQ, T_BigEq, T_do, T_or, T_and, T_div ;
 terminal T_fun, T_mod, T_not, T_ref, T_var, T_return, T_nothing, T_DoQu ,T_SiQu;
 terminal Integer T_num;
-terminal String T_id ;
+terminal java.lang.String T_id;
+
 
 non terminal java.util.List<Stmt> stmt_list;
-non terminal Statement stmt, if_expr, while_expr;
+non terminal Stmt stmt, if_expr, while_expr;
+non terminal Decl decl;
 non terminal Expr expr, bool_expr;
 non terminal String strings, string, char;
 non terminal java.util.List<Decl> decl_list;
 non terminal Program program;
+non terminal Type type;
 
 
 precedence left T_plus , T_minus;
@@ -39,19 +33,34 @@ start with program;
 program ::= decl_list:decls stmt_list:lst            {: RESULT = new Program(decls,lst); :}
       ;
 
+
+
+decl_list ::=                                     {: RESULT = new LinkedList<Decl>(); :}
+           | decl_list:dl decl:d                  {: dl.add(d); RESULT = dl; :}
+           ;
+
+
+
+decl ::= T_var T_id:id T_colon type:t               {: RESULT = new Decl(id,t); :}
+      ;
+
+
+
 stmt_list ::=                                      {: RESULT = new LinkedList<Stmt>(); :}      
         |  stmt_list:sl stmt:s                     {: sl.add(s); RESULT = sl; :}
         ;
+       
 
-stmt ::= T_let T_id:id T_assign expr:e                 {: RESULT = new Let(id, e); :}
+
+
+stmt ::=  T_let T_id:id T_assign expr:e                 {: RESULT = new Let(id, e); :}
          | T_id T_assign strings   
          | T_return expr:e                         {: System.out.println(e); :}
          | T_prints string
-         | T_print expr:e                          {:RESULT = new PrintStatement(e);:} 
-         | T_if expr:c T_then stmt:t T_else stmt:e  {: RESULT = new IfStatement(c,t,e); :}       
-         | if_expr 
+         | T_print expr:e                           {: RESULT = new Print(e); :}
+         | T_if expr:e T_then stmt:ts T_else stmt:es {: RESULT = new If(e,ts,es); :}
+         | T_if expr:e T_then stmt:ts                {: RESULT = new If(e,ts); :}
          | while_expr
-         | T_lpar expr:e1 T_rpar       {: RESULT = e1; :}
          ;
 
 
@@ -63,12 +72,12 @@ expr ::= expr:e1 T_plus expr:e2      {: RESULT = new BinOp(BinOp.Operator.Plus, 
        | expr:e1 T_times expr:e2     {:  RESULT = new BinOp(BinOp.Operator.Times, e1,e2); :}
        | expr:e1 T_div expr:re        {: RESULT = new BinOp(BinOp.Operator.Div, e1,re); :}
        | T_num:n                     {: RESULT = new NumConst(n); :}
-       | T_id:v                     {: RESULT = new Id(v);  :}
+       | T_id:id                      {: RESULT = new Id(id); :}
        | T_lpar expr:e1 T_rpar       {: RESULT = e1; :}
        ;
 
 type ::= T_int                            {:RESULT = BasicType.Int; :}
-       | T_char                           {:RESULT = BasicType.Char :}
+       | T_char                           {:RESULT = BasicType.Char; :}
        ;
 
 strings ::=   T_SiQu char T_SiQu
@@ -78,5 +87,5 @@ strings ::=   T_SiQu char T_SiQu
 char ::= T_id
        ;
        
-String ::=T_id
+String ::= T_id
        ;

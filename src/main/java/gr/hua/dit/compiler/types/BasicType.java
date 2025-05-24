@@ -13,7 +13,7 @@ public class BasicType extends Type {
     private BasicTypeEnum type;
 
     private BasicType(BasicTypeEnum e) {
-        type = e;
+        this.type = e;
     }
 
     public String toString() { return type.toString(); }
