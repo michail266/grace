@@ -1,5 +1,7 @@
 package gr.hua.dit.compiler;
 
+import gr.hua.dit.compiler.ast.Expr;
+
 public class VarExpr extends Expr {
   private String variable_name;
   public VarExpr(String variable_name) {

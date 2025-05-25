@@ -2,6 +2,8 @@ package gr.hua.dit.compiler;
 
 import java.io.*;
 
+import gr.hua.dit.compiler.ast.Program;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -13,12 +15,8 @@ public class Main {
             Lexer l = new Lexer(r);
             Parser p = new Parser(l);
 
-            // parse & execute
-            Program result = (Program) p.parse().value;
-            result.execute();
-//          result.check();
-//          result.codegen();
-//          System.out.println("Value is :" + result.evaluate());
+           Program result = (Program) p.parse().value;
+      result.sem();
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
         }

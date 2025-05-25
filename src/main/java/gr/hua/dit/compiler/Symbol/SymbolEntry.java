@@ -1,4 +1,4 @@
-package Symbol;
+package gr.hua.dit.compiler.Symbol;
 
 import gr.hua.dit.compiler.types.Type;
 

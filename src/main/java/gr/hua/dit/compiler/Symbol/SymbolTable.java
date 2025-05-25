@@ -1,4 +1,5 @@
-package gr.hua.dit.compiler.symbol;
+package gr.hua.dit.compiler.Symbol;
+
 
 import java.util.Deque;
 import java.util.LinkedList;

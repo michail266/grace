@@ -1,5 +1,7 @@
 package gr.hua.dit.compiler;
 
+import gr.hua.dit.compiler.ast.Expr;
+
 public class AssignStatement extends Statement {
   private String variable;
   private Expr e;
@@ -10,6 +12,6 @@ public class AssignStatement extends Statement {
   }
 
   public void execute() {
-    Memory.mem.put(variable, e.evaluate());
+    //Memory.mem.put(variable, e.evaluate());
   }
 }

@@ -1,47 +1,21 @@
-package Symbol;
+package gr.hua.dit.compiler.Symbol;
 
-import java.util.Deque;
-import java.util.LinkedList;
+import java.util.Map;
+import java.util.HashMap;
 
-import gr.hua.dit.compiler.types.Type;
-
-public class SymbolTable {
-
-    public SymbolTable() {
-        scopes = new LinkedList<>();
-
-        // enter the initial scope
-        openScope();
+public class Scope {
+    
+    public Scope() {
+        locals = new HashMap<String,SymbolEntry>();
     }
 
-    public SymbolEntry lookup(String sym) {
-        Scope s = scopes.getFirst();
-        return s.lookupEntry(sym);
+    public SymbolEntry lookupEntry(String sym) {
+        return locals.get(sym);
     }
 
-    // recurse through all scopes
-    public SymbolEntry lookupRec(String sym) {
-        // first scope in the list in the most recent
-        for (Scope s : scopes) {
-            SymbolEntry e = s.lookupEntry(sym);
-            if (e != null)
-                return e;
-        }
-        return null;
+    public void addEntry(String sym, SymbolEntry entry) {
+        locals.put(sym, entry);
     }
 
-    public void addEntry(String sym, Type t) {
-      Scope s = scopes.getFirst();
-      s.addEntry(sym, new SymbolEntry(sym, t));
-    }
-
-    public void openScope() {
-        scopes.addFirst(new Scope());
-    }
-
-    public void closeScope() {
-        scopes.removeFirst();
-    }
-
-    private Deque<Scope> scopes;
+    private Map<String, SymbolEntry> locals;
 }

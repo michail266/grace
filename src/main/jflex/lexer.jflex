@@ -60,6 +60,7 @@ d     =      [0-9]
 "<"             { return createSymbol(Symbols.T_Smaller); }
 ">"             { return createSymbol(Symbols.T_Bigger); }
 "="             { return createSymbol(Symbols.T_assign); }
+"let"           { return createSymbol(Symbols.T_let); }
 "("             { return createSymbol(Symbols.T_lpar); }
 ")"             { return createSymbol(Symbols.T_rpar); }
 "+"             { return createSymbol(Symbols.T_plus); }

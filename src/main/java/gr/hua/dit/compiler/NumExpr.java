@@ -1,5 +1,7 @@
 package gr.hua.dit.compiler;
 
+import gr.hua.dit.compiler.ast.Expr;
+
 public class NumExpr extends Expr {
   public Integer num;
 
