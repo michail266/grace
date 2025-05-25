@@ -1,44 +1,35 @@
-import java_cup.runtime.Symbol;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
  import java.util.List;
 import java.util.LinkedList;
+import gr.hua.dit.compiler.types.*;
+import gr.hua.dit.compiler.errors.*;
+import gr.hua.dit.compiler.ast.*;
+import gr.hua.dit.compiler.Symbol.*;
 
-
-parser code{:
-       Map<String,Integer> mem = new HashMap<String,Integer>();
-       Map<String,String> mems = new HashMap<String,String>();
-:}
-
-terminal T_plus, T_times, T_lpar, T_rpar,  T_if, T_then, T_else, T_assign, T_print, T_prints, T_coma, T_minus, T_while, T_dot, T_colon, T_semicolon, T_Smaller, T_Bigger, T_OpBr, T_ClBr, T_OpCuBr, T_ClCuBr, T_Insert, T_SmEQ, T_BigEq, T_do, T_or, T_and, T_div, T_fun, T_mod, T_not, T_ref, T_var, T_return, T_nothing, T_DoQu ,T_SiQu;
+terminal T_plus, T_times, T_lpar, T_rpar,  T_if, T_then, T_else, T_int, T_char ;
+terminal T_assign,T_let, T_print, T_prints, T_coma ;
+terminal T_minus, T_while, T_dot, T_colon, T_semicolon, T_Smaller, T_Bigger, T_OpBr;
+terminal T_ClBr, T_OpCuBr, T_ClCuBr, T_Insert, T_SmEQ, T_BigEq, T_do, T_or, T_and, T_div ;
+terminal T_fun, T_mod, T_not, T_ref, T_var, T_return, T_nothing, T_DoQu ,T_SiQu;
 terminal Integer T_num;
-terminal String T_id ;
+terminal java.lang.String T_id;
 
-non terminal List<Statement> stmts;
-non terminal Statement stmt, if_expr, while_expr;
 non terminal funDef, header, block, funDecl, fparDef;
 non terminal java.util.List<Stmt> stmt_list;
 non terminal Stmt stmt, if_expr, while_expr;
 non terminal Decl decl;
 non terminal Expr expr, bool_expr;
 non terminal String strings, string, char;
+non terminal java.util.List<Decl> decl_list;
 non terminal Program program;
+non terminal Type type;
+
 
 precedence left T_plus , T_minus;
 precedence left T_times , T_div;
 precedence left T_else , T_do;
-precedence nonassoc T_SmEQ, T_BigEq, T_Smaller, T_Bigger;
-precedence left T_SiQu , T_DoQu;
-
-/*
-sss
-*/
 
 start with program;
 
-stmts ::= stmts:ss stmt:s                         {: RESULT = ss; RESULT.add(s);  :}
-        | stmt:s                                  {: RESULT = new LinkedList<Statement>(); RESULT.add(s); :}
 program ::= decl_list:decls stmt_list:lst            {: RESULT = new Program(decls,lst); :}
       ;
 
@@ -73,17 +64,9 @@ decl ::= T_var T_id:id T_colon type:t  T_semicolon            {: RESULT = new De
 
 stmt_list ::=                                      {: RESULT = new LinkedList<Stmt>(); :}      
         |  stmt_list:sl stmt:s                     {: sl.add(s); RESULT = sl; :}
->>>>>>> Stashed changes
         ;
+       
 
-stmt ::= T_id:v T_assign expr:e                  {:RESULT = new AssignStatement(v, e); :}
-       | T_id T_assign strings   
-       | T_return expr:e                         {: System.out.println(e); :}
-       | T_prints string
-       | T_print expr:e                          {:RESULT = new PrintStatement(e);:} 
-       | T_if expr:c T_then stmt:t T_else stmt:e  {: RESULT = new IfStatement(c,t,e); :}       
-       | if_expr 
-       | while_expr
 
 
 
@@ -102,22 +85,16 @@ stmt ::=  T_var T_id:id T_Insert expr:e  T_semicolon               {: RESULT = n
 while_expr ::=T_while expr:cond T_do stmt_list            
        ;
 
-
-
-while_expr ::=T_while expr:cond T_do stmts           
-       ;
-
-expr ::= expr:e1 T_plus expr:e2      {: RESULT = new PlusExpr(e1, e2); :}
-       | expr:e1 T_times expr:e2     {: RESULT = new TimesExpr(e1, e2); :}
-       | T_num:n                     {: RESULT = new NumExpr(n); :}
-       | T_id:v                      {: RESULT = new VarExpr(v); :}
+expr ::= expr:e1 T_plus expr:e2      {: RESULT = new BinOp(BinOp.Operator.Plus, e1,e2); :}
+       | expr:e1 T_times expr:e2     {:  RESULT = new BinOp(BinOp.Operator.Times, e1,e2); :}
+       | expr:e1 T_div expr:re        {: RESULT = new BinOp(BinOp.Operator.Div, e1,re); :}
+       | T_num:n                     {: RESULT = new NumConst(n); :}
+       | T_id:id                      {: RESULT = new Id(id); :}
        | T_lpar expr:e1 T_rpar       {: RESULT = e1; :}
        ;
 
-bool_expr ::= expr T_SmEQ expr
-       | expr T_BigEq expr
-       | expr T_Smaller expr
-       | expr T_Bigger expr
+type ::= T_int                            {:RESULT = BasicType.Int; :}
+       | T_char                           {:RESULT = BasicType.Char; :}
        ;
 
 strings ::=   T_SiQu char T_SiQu
@@ -126,9 +103,6 @@ strings ::=   T_SiQu char T_SiQu
 
 char ::= T_id
        ;
-
-string ::= T_id
+       
+String ::= T_id
        ;
-
-program ::= stmts:s                               {: RESULT = new Program(s); :}
-        ;
