@@ -1,11 +1,8 @@
-<<<<<<< Updated upstream
 import java_cup.runtime.Symbol;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
-=======
  import java.util.List;
->>>>>>> Stashed changes
 import java.util.LinkedList;
 
 
@@ -18,15 +15,12 @@ terminal T_plus, T_times, T_lpar, T_rpar,  T_if, T_then, T_else, T_assign, T_pri
 terminal Integer T_num;
 terminal String T_id ;
 
-<<<<<<< Updated upstream
 non terminal List<Statement> stmts;
 non terminal Statement stmt, if_expr, while_expr;
-=======
 non terminal funDef, header, block, funDecl, fparDef;
 non terminal java.util.List<Stmt> stmt_list;
 non terminal Stmt stmt, if_expr, while_expr;
 non terminal Decl decl;
->>>>>>> Stashed changes
 non terminal Expr expr, bool_expr;
 non terminal String strings, string, char;
 non terminal Program program;
@@ -43,10 +37,8 @@ sss
 
 start with program;
 
-<<<<<<< Updated upstream
 stmts ::= stmts:ss stmt:s                         {: RESULT = ss; RESULT.add(s);  :}
         | stmt:s                                  {: RESULT = new LinkedList<Statement>(); RESULT.add(s); :}
-=======
 program ::= decl_list:decls stmt_list:lst            {: RESULT = new Program(decls,lst); :}
       ;
 
@@ -84,7 +76,6 @@ stmt_list ::=                                      {: RESULT = new LinkedList<St
 >>>>>>> Stashed changes
         ;
 
-<<<<<<< Updated upstream
 stmt ::= T_id:v T_assign expr:e                  {:RESULT = new AssignStatement(v, e); :}
        | T_id T_assign strings   
        | T_return expr:e                         {: System.out.println(e); :}
@@ -93,7 +84,6 @@ stmt ::= T_id:v T_assign expr:e                  {:RESULT = new AssignStatement(
        | T_if expr:c T_then stmt:t T_else stmt:e  {: RESULT = new IfStatement(c,t,e); :}       
        | if_expr 
        | while_expr
-=======
 
 
 
@@ -110,7 +100,6 @@ stmt ::=  T_var T_id:id T_Insert expr:e  T_semicolon               {: RESULT = n
 
 
 while_expr ::=T_while expr:cond T_do stmt_list            
->>>>>>> Stashed changes
        ;
 
 
