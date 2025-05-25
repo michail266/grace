@@ -13,7 +13,7 @@ terminal T_fun, T_mod, T_not, T_ref, T_var, T_return, T_nothing, T_DoQu ,T_SiQu;
 terminal Integer T_num;
 terminal java.lang.String T_id;
 
-
+non terminal funDef, header, block, funDecl, fparDef;
 non terminal java.util.List<Stmt> stmt_list;
 non terminal Stmt stmt, if_expr, while_expr;
 non terminal Decl decl;
@@ -35,13 +35,29 @@ program ::= decl_list:decls stmt_list:lst            {: RESULT = new Program(dec
 
 
 
+
+header ::= T_fun T_id T_lpar    
+
+
+block ::= T_OpCuBr decl_list:dl stmt_list:sl T_OClCuBr {: RESULT = new Block(dl, sl); :}
+       ;
+
+fparDef  ::= T_ref T_id:id decl_list T_colon  type:t {: :}//watch for decl list may not work
+       |
+
+
+
+
+
+
 decl_list ::=                                     {: RESULT = new LinkedList<Decl>(); :}
            | decl_list:dl decl:d                  {: dl.add(d); RESULT = dl; :}
            ;
 
 
 
-decl ::= T_var T_id:id T_colon type:t               {: RESULT = new Decl(id,t); :}
+decl ::= T_var T_id:id T_colon type:t  T_semicolon            {: RESULT = new Decl(id,t); :}
+       |                                
       ;
 
 
@@ -53,7 +69,8 @@ stmt_list ::=                                      {: RESULT = new LinkedList<St
 
 
 
-stmt ::=  T_let T_id:id T_assign expr:e                 {: RESULT = new Let(id, e); :}
+
+stmt ::=  T_var T_id:id T_Insert expr:e  T_semicolon               {: RESULT = new Let(id, e); :}
          | T_id T_assign strings   
          | T_return expr:e                         {: System.out.println(e); :}
          | T_prints string
