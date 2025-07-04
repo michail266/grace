@@ -28,6 +28,8 @@ non terminal Header header;
 non terminal Local_def local_def;
 non terminal Fpar_def fpar_def;
 non terminal ret_type;
+non terminal Block block;
+non terminal fpar_type;
 
 precedence left T_plus , T_minus;
 precedence left T_times , T_div;
@@ -40,15 +42,15 @@ program ::= fun_def             {: RESULT = new Program(decls,lst); :}
 
 
 
-fun_def ::= header local_def block;
+fun_def ::= header local_def_list block;
 
 
 header ::=  T_fun:id T_lpar fpar_def T_semicolon fpar_def_list  T_rpar T_colon ret_type ;
        | T_fun:id T_lpar fpar_def T_semicolon T_rpar T_colon ret_type ;
-       ;
+  T_fun:id T_    ;
 
 
-fpar_def ::= T_ref id_list T_coma id_list T_colon type;
+fpar_def ::= T_ref id_list T_coma id_list T_colon fpar_type;
 
 
 fpar_def_list ::= fpar_def_list:dl fpar_def ;
@@ -93,6 +95,8 @@ id_list ::=                                {: RESULT = new LinkedList<String>();
          ;
 
 
+block ::= T_OpCuBr stmt_list T_ClCuBr
+       ;
 
 
 
