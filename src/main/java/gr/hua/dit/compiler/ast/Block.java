@@ -3,8 +3,9 @@ package gr.hua.dit.compiler.ast;
 import java.util.List;
 import java.util.StringJoiner;
 
+import gr.hua.dit.compiler.CompileContext;
+import gr.hua.dit.compiler.Symbol.SymbolTable;
 import gr.hua.dit.compiler.errors.SemanticException;
-import gr.hua.dit.compiler.Symbol.*;
 
 public class Block extends Stmt {
   private List<Stmt> stmts;
@@ -34,5 +35,10 @@ public class Block extends Stmt {
 
   public List<Stmt> getStmts() {
     return stmts;
+  }
+    public void compile(CompileContext context) {
+    for (Stmt s : stmts) {
+      s.compile(context);
+    }
   }
 }

@@ -1,10 +1,12 @@
 package gr.hua.dit.compiler.ast;
 
-import gr.hua.dit.compiler.errors.SemanticException;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.InsnNode;
 
-import gr.hua.dit.compiler.types.*;
+import gr.hua.dit.compiler.CompileContext;
+import gr.hua.dit.compiler.Symbol.SymbolTable;
 import gr.hua.dit.compiler.errors.SemanticException;
-import gr.hua.dit.compiler.Symbol.*;
+import gr.hua.dit.compiler.types.BasicType;
 
 public class BinOp extends Expr {
 
@@ -39,6 +41,25 @@ public class BinOp extends Expr {
     
     // All operators return INT (Grace treats non-zero as true)
     type = BasicType.Int;
+  }
+
+    public void compile(CompileContext context) {
+    l.compile(context);
+    r.compile(context);
+    switch (this.op) {
+      case Plus:
+        context.addInsn(new InsnNode(Opcodes.IADD));
+        break;
+      case Minus:
+        context.addInsn(new InsnNode(Opcodes.ISUB));
+        break;
+      case Times:
+        context.addInsn(new InsnNode(Opcodes.IMUL));
+        break;
+      case Div:
+        context.addInsn(new InsnNode(Opcodes.IDIV));
+        break;
+    }
   }
 
 }

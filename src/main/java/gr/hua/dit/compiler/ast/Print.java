@@ -1,15 +1,25 @@
 package gr.hua.dit.compiler.ast;
 
-import gr.hua.dit.compiler.errors.SemanticException;
-import gr.hua.dit.compiler.Symbol.SymbolTable;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+
+import gr.hua.dit.compiler.CompileContext;
 
 public class Print extends Stmt {
   private Expr e;
   public Print(Expr e) { this.e = e; }
 
   public String toString() { return "Print(" + e + ")"; }
-  
-  public void sem(SymbolTable tbl) throws SemanticException {
-    e.sem(tbl);
+
+    public void compile(CompileContext context) {
+    context.addInsn(new FieldInsnNode(Opcodes.GETSTATIC,
+      "java/lang/System", "out", "Ljava/io/PrintStream;"
+    ));
+    e.compile(context);
+    context.addInsn(
+      new MethodInsnNode(Opcodes.INVOKEVIRTUAL,
+        "java/io/PrintStream", "println", "(I)V"));
   }
+  
 }

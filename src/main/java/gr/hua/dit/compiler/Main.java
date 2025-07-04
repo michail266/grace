@@ -1,6 +1,8 @@
 package gr.hua.dit.compiler;
 
-import java.io.*;
+import java.io.FileReader;
+import java.io.Reader;
+
 import gr.hua.dit.compiler.ast.Program;
 
 public class Main {
