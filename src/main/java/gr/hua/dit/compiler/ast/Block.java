@@ -23,9 +23,16 @@ public class Block extends Stmt {
   }
 
   public void sem(SymbolTable tbl) throws SemanticException {
-    tbl.openScope();
+    // Don't open new scope for blocks - variables should be function-scoped in Grace
     for (Decl d : decls) d.sem(tbl);
     for (Stmt s : stmts) s.sem(tbl);
-    tbl.closeScope();
+  }
+
+  public List<Decl> getDecls() {
+    return decls;
+  }
+
+  public List<Stmt> getStmts() {
+    return stmts;
   }
 }

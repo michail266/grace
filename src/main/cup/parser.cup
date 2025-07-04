@@ -6,123 +6,211 @@ import gr.hua.dit.compiler.errors.*;
 import gr.hua.dit.compiler.ast.*;
 import gr.hua.dit.compiler.Symbol.*;
 
-terminal T_plus, T_times, T_lpar, T_rpar,  T_if, T_then, T_else, T_int, T_char ;
-terminal T_assign,T_let, T_print, T_prints, T_coma ;
+terminal T_plus, T_times, T_lpar, T_rpar, T_if, T_then, T_else, T_int, T_char;
+terminal T_assign, T_let, T_print, T_prints, T_puts, T_coma, T_geti, T_puti;
 terminal T_minus, T_while, T_dot, T_colon, T_semicolon, T_Smaller, T_Bigger, T_OpBr;
-terminal T_ClBr, T_OpCuBr, T_ClCuBr, T_Insert, T_SmEQ, T_BigEq, T_do, T_or, T_and, T_div ;
-terminal T_fun, T_mod, T_not, T_ref, T_var, T_return, T_nothing, T_DoQu ,T_SiQu;
+terminal T_ClBr, T_OpCuBr, T_ClCuBr, T_Insert, T_SmEQ, T_BigEq, T_do, T_or, T_and, T_div, T_NotEq;
+terminal T_fun, T_mod, T_not, T_ref, T_var, T_return, T_nothing, T_DoQu, T_SiQu;
 terminal Integer T_num;
-terminal java.lang.String T_id;
+terminal java.lang.String T_id, T_string;
 
-
-non terminal java.util.List<Stmt> stmt_list;
-non terminal java.util.List<String> id_list;
-non terminal Stmt stmt, if_expr, while_expr;
-non terminal Decl decl;
-non terminal Expr expr, bool_expr;
-non terminal String strings, string, char;
-non terminal java.util.List<Decl> decl_list;
 non terminal Program program;
-non terminal Type type, ret_type;
-non terminal Stmt fun_def;
+non terminal Stmt func_def;
 non terminal Stmt header;
 non terminal java.util.List<Stmt> local_def_list;
+non terminal Stmt local_def;
+non terminal Stmt func_decl;
+non terminal Stmt var_def;
 non terminal Stmt fpar_def;
 non terminal java.util.List<Stmt> fpar_def_list;
+non terminal Type data_type, type, ret_type, fpar_type;
+non terminal java.util.List<Stmt> stmt_list;
+non terminal Stmt stmt, block;
+non terminal Expr expr, func_call, l_value, cond;
+non terminal java.util.List<String> id_list;
+non terminal java.util.List<Expr> expr_list;
+non terminal String string_literal;
 
-precedence left T_plus , T_minus;
-precedence left T_times , T_div;
-precedence left T_else , T_do;
+precedence left T_or;
+precedence left T_and;
+precedence left T_assign, T_Smaller, T_Bigger, T_SmEQ, T_BigEq, T_NotEq;
+precedence left T_plus, T_minus;
+precedence left T_times, T_div, T_mod;
+precedence right T_not;
+precedence left T_OpBr, T_ClBr;
 
 start with program;
 
-program ::= fun_def:fd             {: RESULT = new Program(Collections.singletonList(fd)); :}
+program ::= func_def:fd             {: RESULT = new Program(Collections.singletonList(fd)); :}
       ;
 
-fun_def ::= header:h local_def_list:ldl T_OpCuBr stmt_list:sl T_ClCuBr   {: RESULT = new Block(new LinkedList<Decl>(), sl); :}
+func_def ::= header:h local_def_list:ldl block:b   {: 
+    LinkedList<Decl> decls = new LinkedList<Decl>();
+    LinkedList<Stmt> stmts = new LinkedList<Stmt>();
+    
+    // Add parameters from header
+    if (h instanceof Block) {
+        Block blk = (Block) h;
+        decls.addAll(blk.getDecls());
+        stmts.addAll(blk.getStmts());
+    }
+    
+    // Add local definitions
+    for (Stmt s : ldl) {
+        if (s instanceof Block) {
+            Block blk = (Block) s;
+            decls.addAll(blk.getDecls());
+            stmts.addAll(blk.getStmts());
+        } else {
+            stmts.add(s);
+        }
+    }
+    
+    // Add main block
+    if (b instanceof Block) {
+        Block blk = (Block) b;
+        decls.addAll(blk.getDecls());
+        stmts.addAll(blk.getStmts());
+    } else {
+        stmts.add(b);
+    }
+    
+    RESULT = new Block(decls, stmts);
+:}
       ;
 
-
-header ::= T_fun T_id:id T_lpar fpar_def_list:fpl T_rpar T_colon ret_type:rt  {: RESULT = new Block(new LinkedList<Decl>(), new LinkedList<Stmt>()); :}
+header ::= T_fun T_id:id T_lpar fpar_def_list:fpl T_rpar T_colon ret_type:rt  {: 
+    LinkedList<Decl> decls = new LinkedList<Decl>();
+    for (Stmt s : fpl) {
+        if (s instanceof Block) {
+            Block blk = (Block) s;
+            decls.addAll(blk.getDecls());
+        }
+    }
+    RESULT = new Block(decls, new LinkedList<Stmt>());
+:}
        | T_fun T_id:id T_lpar T_rpar T_colon ret_type:rt                     {: RESULT = new Block(new LinkedList<Decl>(), new LinkedList<Stmt>()); :}
        ;
 
-
-fpar_def ::= T_ref id_list:il1 T_coma id_list:il2 T_colon type:t  {: RESULT = new Block(new LinkedList<Decl>(), new LinkedList<Stmt>()); :}
+fpar_def ::= T_ref id_list:il T_colon fpar_type:ft  {: 
+    LinkedList<Decl> decls = new LinkedList<Decl>();
+    for (String id : il) {
+        decls.add(new Decl(id, ft));
+    }
+    RESULT = new Block(decls, new LinkedList<Stmt>());
+:}
+       | id_list:il T_colon fpar_type:ft            {: 
+    LinkedList<Decl> decls = new LinkedList<Decl>();
+    for (String id : il) {
+        decls.add(new Decl(id, ft));
+    }
+    RESULT = new Block(decls, new LinkedList<Stmt>());
+:}
        ;
-
 
 fpar_def_list ::= fpar_def:fd                         {: RESULT = new LinkedList<Stmt>(); ((LinkedList<Stmt>)RESULT).add(fd); :}
            | fpar_def_list:fdl T_semicolon fpar_def:fd {: fdl.add(fd); RESULT = fdl; :}
            ;
 
 local_def_list ::=                                     {: RESULT = new LinkedList<Stmt>(); :}
-           | local_def_list:ldl fun_def:fd             {: ldl.add(fd); RESULT = ldl; :}
-           | local_def_list:ldl header:h T_semicolon   {: ldl.add(h); RESULT = ldl; :}
+           | local_def_list:ldl local_def:ld           {: ldl.add(ld); RESULT = ldl; :}
            ;
 
+local_def ::= func_def:fd                             {: RESULT = fd; :}
+        | func_decl:fd                                {: RESULT = fd; :}
+        | var_def:vd                                  {: RESULT = vd; :}
+        ;
 
+func_decl ::= header:h T_semicolon                    {: RESULT = h; :}
+        ;
 
-
-decl_list ::=                                     {: RESULT = new LinkedList<Decl>(); :}
-           | decl_list:dl decl:d                  {: dl.add(d); RESULT = dl; :}
-           ;
-
-
-
-
-decl ::= T_var T_id:id T_colon type:t  T_semicolon            {: RESULT = new Decl(id,t); :}
+var_def ::= T_var id_list:il T_colon type:t T_semicolon {: 
+    LinkedList<Decl> decls = new LinkedList<Decl>();
+    for (String id : il) {
+        decls.add(new Decl(id, t));
+    }
+    RESULT = new Block(decls, new LinkedList<Stmt>());
+:}
       ;
 
-stmt_list ::=                                      {: RESULT = new LinkedList<Stmt>(); :}      
-        |  stmt_list:sl stmt:s                     {: sl.add(s); RESULT = sl; :}
+data_type ::= T_int                                   {: RESULT = BasicType.Int; :}
+        | T_char                                      {: RESULT = BasicType.Char; :}
         ;
-       
 
+type ::= data_type:dt                                 {: RESULT = dt; :}
+   | data_type:dt T_OpBr T_ClBr                       {: RESULT = dt; :}
+   ;
 
-
-stmt ::= T_var T_id:id T_Insert expr:e  T_semicolon               {: RESULT = new Let(id, e); :}
-         | T_id:id T_assign strings:s T_semicolon                  {: RESULT = new Block(new LinkedList<Decl>(), new LinkedList<Stmt>()); :}
-         | T_return expr:e T_semicolon                             {: System.out.println(e); RESULT = new Block(new LinkedList<Decl>(), new LinkedList<Stmt>()); :}
-         | T_prints string:s T_semicolon                           {: RESULT = new Block(new LinkedList<Decl>(), new LinkedList<Stmt>()); :}
-         | T_print expr:e T_semicolon                              {: RESULT = new Print(e); :}
-         | T_if expr:e T_then stmt:ts T_else stmt:es               {: RESULT = new If(e,ts,es); :}
-         | T_if expr:e T_then stmt:ts                              {: RESULT = new If(e,ts); :}
-         | while_expr:we                                           {: RESULT = we; :}
-         ;
-
-id_list ::=                                {: RESULT = new LinkedList<String>(); :}
-         | id_list:ids T_id:id             {: ids.add(id); RESULT = ids; :}
-         ;
-
-
-
-while_expr ::= T_while expr:cond T_do stmt_list:sl    {: RESULT = new Block(new LinkedList<Decl>(), sl); :}
+ret_type ::= data_type:dt                             {: RESULT = dt; :}
+       | T_nothing                                    {: RESULT = BasicType.Int; :}
        ;
 
-expr ::= expr:e1 T_plus expr:e2      {: RESULT = new BinOp(BinOp.Operator.Plus, e1,e2); :}
-       | expr:e1 T_times expr:e2     {:  RESULT = new BinOp(BinOp.Operator.Times, e1,e2); :}
-       | expr:e1 T_div expr:re        {: RESULT = new BinOp(BinOp.Operator.Div, e1,re); :}
-       | T_num:n                     {: RESULT = new NumConst(n); :}
-       | T_id:id                      {: RESULT = new Id(id); :}
-       | T_lpar expr:e1 T_rpar       {: RESULT = e1; :}
+fpar_type ::= data_type:dt                            {: RESULT = dt; :}
+        | data_type:dt T_OpBr T_ClBr                  {: RESULT = dt; :}
+        ;
+
+stmt_list ::=                                         {: RESULT = new LinkedList<Stmt>(); :}      
+        | stmt_list:sl stmt:s                         {: sl.add(s); RESULT = sl; :}
+        ;
+
+stmt ::= T_semicolon                                               {: RESULT = new Block(new LinkedList<Decl>(), new LinkedList<Stmt>()); :}
+       | l_value:lv T_Insert expr:e T_semicolon                    {: RESULT = new Let(((Id)lv).getId(), e); :}
+       | block:b                                                   {: RESULT = b; :}
+       | T_puts T_lpar expr:e T_rpar T_semicolon                   {: RESULT = new Print(e); :}
+       | T_puti T_lpar expr:e T_rpar T_semicolon                   {: RESULT = new Print(e); :}
+       | T_if cond:c T_then stmt:s1 T_else stmt:s2                 {: RESULT = new If(c, s1, s2); :}
+       | T_if cond:c T_then stmt:s1                                {: RESULT = new If(c, s1); :}
+       | T_while cond:c T_do stmt:s                                {: RESULT = new Block(new LinkedList<Decl>(), Collections.singletonList(s)); :}
+       | T_return expr:e T_semicolon                               {: RESULT = new Block(new LinkedList<Decl>(), new LinkedList<Stmt>()); :}
+       | T_return T_semicolon                                      {: RESULT = new Block(new LinkedList<Decl>(), new LinkedList<Stmt>()); :}
        ;
 
-type ::= T_int                            {:RESULT = BasicType.Int; :}
-       | T_char                           {:RESULT = BasicType.Char; :}
+block ::= T_OpCuBr stmt_list:sl T_ClCuBr              {: RESULT = new Block(new LinkedList<Decl>(), sl); :}
+    ;
+
+func_call ::= T_id:id T_lpar expr_list:el T_rpar      {: RESULT = new FuncCall(id, el); :}
+        | T_id:id T_lpar T_rpar                       {: RESULT = new FuncCall(id, new LinkedList<Expr>()); :}
+        ;
+
+l_value ::= T_id:id                                   {: RESULT = new Id(id); :}
+      | string_literal:sl                             {: RESULT = new Id(sl); :}
+      | l_value:lv T_OpBr expr:e T_ClBr               {: RESULT = lv; :}
+      ;
+
+expr ::= T_num:n                                      {: RESULT = new NumConst(n); :}
+       | T_string:s                                   {: RESULT = new NumConst(0); :}
+       | l_value:lv                                   {: RESULT = lv; :}
+       | func_call:fc                                 {: RESULT = fc; :}
+       | T_geti T_lpar T_rpar                         {: RESULT = new FuncCall("geti", new LinkedList<Expr>()); :}
+       | T_lpar expr:e T_rpar                         {: RESULT = e; :}
+       | T_plus expr:e                                {: RESULT = e; :}
+       | T_minus expr:e                               {: RESULT = e; :}
+       | expr:e1 T_plus expr:e2                       {: RESULT = new BinOp(BinOp.Operator.Plus, e1, e2); :}
+       | expr:e1 T_minus expr:e2                      {: RESULT = new BinOp(BinOp.Operator.Minus, e1, e2); :}
+       | expr:e1 T_times expr:e2                      {: RESULT = new BinOp(BinOp.Operator.Times, e1, e2); :}
+       | expr:e1 T_div expr:e2                        {: RESULT = new BinOp(BinOp.Operator.Div, e1, e2); :}
+       | expr:e1 T_mod expr:e2                        {: RESULT = new BinOp(BinOp.Operator.Mod, e1, e2); :}
        ;
 
-ret_type ::= type:t                               {: RESULT = t; :}
-       | T_nothing                                {: RESULT = BasicType.Int; :}
+cond ::= T_lpar cond:c T_rpar                         {: RESULT = c; :}
+       | T_not cond:c                                 {: RESULT = c; :}
+       | cond:c1 T_and cond:c2                        {: RESULT = c1; :}
+       | cond:c1 T_or cond:c2                         {: RESULT = c1; :}
+       | expr:e1 T_assign expr:e2                     {: RESULT = new BinOp(BinOp.Operator.Eq, e1, e2); :}
+       | expr:e1 T_Smaller expr:e2                    {: RESULT = new BinOp(BinOp.Operator.Less, e1, e2); :}
+       | expr:e1 T_Bigger expr:e2                     {: RESULT = new BinOp(BinOp.Operator.Greater, e1, e2); :}
+       | expr:e1 T_SmEQ expr:e2                       {: RESULT = new BinOp(BinOp.Operator.LessEq, e1, e2); :}
+       | expr:e1 T_BigEq expr:e2                      {: RESULT = new BinOp(BinOp.Operator.GreaterEq, e1, e2); :}
+       | expr:e1 T_NotEq expr:e2                      {: RESULT = new BinOp(BinOp.Operator.NotEq, e1, e2); :}
        ;
 
+id_list ::= T_id:id                                   {: RESULT = new LinkedList<String>(); ((LinkedList<String>)RESULT).add(id); :}
+      | id_list:il T_coma T_id:id                     {: il.add(id); RESULT = il; :}
+      ;
 
-strings ::= T_SiQu char:c T_SiQu                  {: RESULT = c; :}
-       | T_DoQu string:s T_DoQu                   {: RESULT = s; :}
-       ;
+expr_list ::= expr:e                                  {: RESULT = new LinkedList<Expr>(); ((LinkedList<Expr>)RESULT).add(e); :}
+        | expr_list:el T_coma expr:e                  {: el.add(e); RESULT = el; :}
+        ;
 
-char ::= T_id:id                              {: RESULT = id; :}
-       ;
-       
-string ::= T_id:id                            {: RESULT = id; :}
-       ;
+string_literal ::= T_DoQu T_id:id T_DoQu              {: RESULT = id; :}
+             ;

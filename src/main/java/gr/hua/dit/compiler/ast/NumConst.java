@@ -1,6 +1,7 @@
 package gr.hua.dit.compiler.ast;
 
 import gr.hua.dit.compiler.types.*;
+import gr.hua.dit.compiler.Symbol.SymbolTable;
 
 public class NumConst extends Expr {
   private Integer value;
@@ -10,7 +11,7 @@ public class NumConst extends Expr {
 
   public String toString() { return "NumConst(" + value.toString() + ")"; }
 
-  public void sem() {
+  public void sem(SymbolTable tbl) {
     type = BasicType.Int;
   }
 }

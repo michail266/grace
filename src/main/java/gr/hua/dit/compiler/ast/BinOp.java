@@ -12,7 +12,14 @@ public class BinOp extends Expr {
     Plus,
     Minus,
     Times,
-    Div
+    Div,
+    Mod,
+    Eq,
+    NotEq,
+    Less,
+    Greater,
+    LessEq,
+    GreaterEq
   };
 
   private Operator op;
@@ -29,6 +36,8 @@ public class BinOp extends Expr {
   public void sem(SymbolTable tbl) throws SemanticException {
     l.typeCheck(tbl, BasicType.Int);
     r.typeCheck(tbl, BasicType.Int);
+    
+    // All operators return INT (Grace treats non-zero as true)
     type = BasicType.Int;
   }
 

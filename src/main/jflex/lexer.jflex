@@ -31,6 +31,7 @@ delim =      [ \t\r\n]
 ws    =      {delim}
 l     =      [A-Za-z][A-Za-z0-9_-]*
 d     =      [0-9]
+str   =      \"[^\"]*\"
 %%
 
 "if"            { return createSymbol(Symbols.T_if); }
@@ -46,6 +47,8 @@ d     =      [0-9]
 "var"           { return createSymbol(Symbols.T_var); }
 "nothing"       { return createSymbol(Symbols.T_nothing); }
 "fun"           { return createSymbol(Symbols.T_fun); }
+"int"           { return createSymbol(Symbols.T_int); }
+"char"          { return createSymbol(Symbols.T_char); }
 ":"             { return createSymbol(Symbols.T_colon); }
 ";"             { return createSymbol(Symbols.T_semicolon); }
 ","             { return createSymbol(Symbols.T_coma); }
@@ -70,13 +73,18 @@ d     =      [0-9]
 "\""            { return createSymbol(Symbols.T_DoQu); }
 "div"           { return createSymbol(Symbols.T_div); }
 "mod"           { return createSymbol(Symbols.T_mod); }
+"geti"          { return createSymbol(Symbols.T_geti); }
+"puts"          { return createSymbol(Symbols.T_puts); }
+"puti"          { return createSymbol(Symbols.T_puti); }
 "prints"        { return createSymbol(Symbols.T_prints); }
 "print"         { return createSymbol(Symbols.T_print); }
+"#"             { return createSymbol(Symbols.T_Bigger); }
 
 
 
 {d}+            { return createSymbol(Symbols.T_num, Integer.valueOf(yytext())); }
 {l}+            { return createSymbol(Symbols.T_id, yytext()); }
+{str}           { return createSymbol(Symbols.T_string, yytext()); }
 
 
 \$.*            {}

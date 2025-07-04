@@ -24,16 +24,14 @@
   -->
 
   <dependencies>
-        <!-- <dependency>
-          <groupId>net.sf.squirrel-sql.thirdparty-non-maven</groupId>
-          <artifactId>java-cup</artifactId>
-          <version>${java-cup.version}</version>
-          <type>jar</type>
-          <scope>compile</scope>
-      </dependency> -->
       <dependency>
         <groupId>com.github.vbmacher</groupId>
         <artifactId>java-cup-runtime</artifactId>
+        <version>${java-cup.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.vbmacher</groupId>
+        <artifactId>java-cup</artifactId>
         <version>${java-cup.version}</version>
       </dependency>
   

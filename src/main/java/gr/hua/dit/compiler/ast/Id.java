@@ -1,4 +1,3 @@
-
 package gr.hua.dit.compiler.ast;
 
 import gr.hua.dit.compiler.Symbol.SymbolEntry;
@@ -21,5 +20,9 @@ public class Id extends Expr {
     } else {
       throw new TypeException("Variable '" + name + "' not declared");
     }
+  }
+
+  public String getId() {
+    return name;
   }
 }
