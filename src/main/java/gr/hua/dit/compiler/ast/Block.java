@@ -11,6 +11,7 @@ public class Block extends Stmt {
   private List<Decl> decls;
 
   public Block(List<Decl> decls, List<Stmt> stmts) {
+    this.decls = decls;
     this.stmts = stmts;
   }
 

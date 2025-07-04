@@ -1,5 +1,6 @@
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Collections;
 import gr.hua.dit.compiler.types.*;
 import gr.hua.dit.compiler.errors.*;
 import gr.hua.dit.compiler.ast.*;
@@ -13,16 +14,21 @@ terminal T_fun, T_mod, T_not, T_ref, T_var, T_return, T_nothing, T_DoQu ,T_SiQu;
 terminal Integer T_num;
 terminal java.lang.String T_id;
 
-non terminal funDef, header, block, funDecl, fparDef;
+
 non terminal java.util.List<Stmt> stmt_list;
+non terminal java.util.List<String> id_list;
 non terminal Stmt stmt, if_expr, while_expr;
 non terminal Decl decl;
 non terminal Expr expr, bool_expr;
 non terminal String strings, string, char;
 non terminal java.util.List<Decl> decl_list;
 non terminal Program program;
-non terminal Type type;
-
+non terminal Type type, ret_type;
+non terminal Stmt fun_def;
+non terminal Stmt header;
+non terminal java.util.List<Stmt> local_def_list;
+non terminal Stmt fpar_def;
+non terminal java.util.List<Stmt> fpar_def_list;
 
 precedence left T_plus , T_minus;
 precedence left T_times , T_div;
@@ -30,22 +36,30 @@ precedence left T_else , T_do;
 
 start with program;
 
-program ::= decl_list:decls stmt_list:lst            {: RESULT = new Program(decls,lst); :}
+program ::= fun_def:fd             {: RESULT = new Program(Collections.singletonList(fd)); :}
+      ;
+
+fun_def ::= header:h local_def_list:ldl T_OpCuBr stmt_list:sl T_ClCuBr   {: RESULT = new Block(new LinkedList<Decl>(), sl); :}
       ;
 
 
-
-
-header ::= T_fun T_id T_lpar    
-
-
-block ::= T_OpCuBr decl_list:dl stmt_list:sl T_OClCuBr {: RESULT = new Block(dl, sl); :}
+header ::= T_fun T_id:id T_lpar fpar_def_list:fpl T_rpar T_colon ret_type:rt  {: RESULT = new Block(new LinkedList<Decl>(), new LinkedList<Stmt>()); :}
+       | T_fun T_id:id T_lpar T_rpar T_colon ret_type:rt                     {: RESULT = new Block(new LinkedList<Decl>(), new LinkedList<Stmt>()); :}
        ;
 
-fparDef  ::= T_ref T_id:id decl_list T_colon  type:t {: :}//watch for decl list may not work
-       |
+
+fpar_def ::= T_ref id_list:il1 T_coma id_list:il2 T_colon type:t  {: RESULT = new Block(new LinkedList<Decl>(), new LinkedList<Stmt>()); :}
+       ;
 
 
+fpar_def_list ::= fpar_def:fd                         {: RESULT = new LinkedList<Stmt>(); ((LinkedList<Stmt>)RESULT).add(fd); :}
+           | fpar_def_list:fdl T_semicolon fpar_def:fd {: fdl.add(fd); RESULT = fdl; :}
+           ;
+
+local_def_list ::=                                     {: RESULT = new LinkedList<Stmt>(); :}
+           | local_def_list:ldl fun_def:fd             {: ldl.add(fd); RESULT = ldl; :}
+           | local_def_list:ldl header:h T_semicolon   {: ldl.add(h); RESULT = ldl; :}
+           ;
 
 
 
@@ -56,11 +70,9 @@ decl_list ::=                                     {: RESULT = new LinkedList<Dec
 
 
 
+
 decl ::= T_var T_id:id T_colon type:t  T_semicolon            {: RESULT = new Decl(id,t); :}
-       |                                
       ;
-
-
 
 stmt_list ::=                                      {: RESULT = new LinkedList<Stmt>(); :}      
         |  stmt_list:sl stmt:s                     {: sl.add(s); RESULT = sl; :}
@@ -69,20 +81,23 @@ stmt_list ::=                                      {: RESULT = new LinkedList<St
 
 
 
+stmt ::= T_var T_id:id T_Insert expr:e  T_semicolon               {: RESULT = new Let(id, e); :}
+         | T_id:id T_assign strings:s T_semicolon                  {: RESULT = new Block(new LinkedList<Decl>(), new LinkedList<Stmt>()); :}
+         | T_return expr:e T_semicolon                             {: System.out.println(e); RESULT = new Block(new LinkedList<Decl>(), new LinkedList<Stmt>()); :}
+         | T_prints string:s T_semicolon                           {: RESULT = new Block(new LinkedList<Decl>(), new LinkedList<Stmt>()); :}
+         | T_print expr:e T_semicolon                              {: RESULT = new Print(e); :}
+         | T_if expr:e T_then stmt:ts T_else stmt:es               {: RESULT = new If(e,ts,es); :}
+         | T_if expr:e T_then stmt:ts                              {: RESULT = new If(e,ts); :}
+         | while_expr:we                                           {: RESULT = we; :}
+         ;
 
-stmt ::=  T_var T_id:id T_Insert expr:e  T_semicolon               {: RESULT = new Let(id, e); :}
-         | T_id T_assign strings   
-         | T_return expr:e                         {: System.out.println(e); :}
-         | T_prints string
-         | T_print expr:e                           {: RESULT = new Print(e); :}
-         | T_if expr:e T_then stmt:ts T_else stmt:es {: RESULT = new If(e,ts,es); :}
-         | T_if expr:e T_then stmt:ts                {: RESULT = new If(e,ts); :}
-         | while_expr
+id_list ::=                                {: RESULT = new LinkedList<String>(); :}
+         | id_list:ids T_id:id             {: ids.add(id); RESULT = ids; :}
          ;
 
 
 
-while_expr ::=T_while expr:cond T_do stmt_list            
+while_expr ::= T_while expr:cond T_do stmt_list:sl    {: RESULT = new Block(new LinkedList<Decl>(), sl); :}
        ;
 
 expr ::= expr:e1 T_plus expr:e2      {: RESULT = new BinOp(BinOp.Operator.Plus, e1,e2); :}
@@ -97,14 +112,17 @@ type ::= T_int                            {:RESULT = BasicType.Int; :}
        | T_char                           {:RESULT = BasicType.Char; :}
        ;
 
-strings ::=   T_SiQu char T_SiQu
-       |      T_DoQu string T_DoQu
+ret_type ::= type:t                               {: RESULT = t; :}
+       | T_nothing                                {: RESULT = BasicType.Int; :}
        ;
 
-char ::= T_id
-       ;
-       
-String ::= T_id
+
+strings ::= T_SiQu char:c T_SiQu                  {: RESULT = c; :}
+       | T_DoQu string:s T_DoQu                   {: RESULT = s; :}
        ;
 
+char ::= T_id:id                              {: RESULT = id; :}
+       ;
        
+string ::= T_id:id                            {: RESULT = id; :}
+       ;
