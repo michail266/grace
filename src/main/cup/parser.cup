@@ -18,9 +18,6 @@ non terminal Program program;
 non terminal Stmt func_def;
 non terminal Stmt header;
 non terminal java.util.List<Stmt> local_def_list;
-non terminal java.util.List<Stmt> header_list;
-non terminal java.util.List<Stmt> block_list;
-non terminal java.util.List<Stmt> nested_func_list;
 non terminal Stmt local_def;
 non terminal Stmt func_decl;
 non terminal Stmt var_def;
@@ -178,7 +175,6 @@ local_def ::= func_def:fd                             {: RESULT = fd; :}
         | func_decl:fd                                {: RESULT = fd; :}
         | var_def:vd                                  {: RESULT = vd; :}
         | stmt:s                                      {: RESULT = s; :}
-        | header:h                                    {: RESULT = h; :}
         ;
 
 func_decl ::= header:h T_semicolon                    {: RESULT = h; :}
@@ -282,16 +278,3 @@ expr_list ::= expr:e                                  {: RESULT = new LinkedList
 id_list ::= T_id:id                                   {: RESULT = new LinkedList<String>(); ((LinkedList<String>)RESULT).add(id); :}
       | id_list:il T_coma T_id:id                     {: il.add(id); RESULT = il; :}
       ;
-
-nested_func_list ::=                                         {: RESULT = new LinkedList<Stmt>(); :}
-                  | nested_func_list:nfl header:h            {: nfl.add(h); RESULT = nfl; :}
-                  ;
-
-// Header list: one or more function headers
-header_list ::= header:h                                     {: RESULT = new LinkedList<Stmt>(); ((LinkedList<Stmt>)RESULT).add(h); :}
-             | header_list:hl header:h                       {: hl.add(h); RESULT = hl; :}
-             ;
-
-block_list ::= block:b                                       {: RESULT = new LinkedList<Stmt>(); ((LinkedList<Stmt>)RESULT).add(b); :}
-            | block_list:bl block:b                          {: bl.add(b); RESULT = bl; :}
-            ;
