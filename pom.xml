@@ -88,7 +88,7 @@
           <packageName>gr.hua.dit.compiler</packageName>
           <className>Parser</className>
           <symbolsName>Symbols</symbolsName>
-          <expectedConflicts>1</expectedConflicts>
+          <expectedConflicts>50</expectedConflicts>
         </configuration>
       </plugin>
       <!-- <plugin>

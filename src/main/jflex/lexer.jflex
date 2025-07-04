@@ -86,7 +86,6 @@ str   =      \"[^\"]*\"
 {l}+            { return createSymbol(Symbols.T_id, yytext()); }
 {str}           { return createSymbol(Symbols.T_string, yytext()); }
 
-
 \$.*            {}
 "$$"([^$]|\$[^\$])*"$$"      {}
 
