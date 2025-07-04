@@ -78,7 +78,7 @@ str   =      \"[^\"]*\"
 "puti"          { return createSymbol(Symbols.T_puti); }
 "prints"        { return createSymbol(Symbols.T_prints); }
 "print"         { return createSymbol(Symbols.T_print); }
-"#"             { return createSymbol(Symbols.T_Bigger); }
+"#"             { return createSymbol(Symbols.T_NotEq); }
 
 
 

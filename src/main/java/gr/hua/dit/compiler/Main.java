@@ -1,12 +1,14 @@
 package gr.hua.dit.compiler;
 
-import java.io.*;
+import java.io.FileReader;
+import java.io.Reader;
+
 import gr.hua.dit.compiler.ast.Program;
 
 public class Main {
 
     public static void main(String[] args) {
-        String filePath = args.length > 0 ? args[0] : "test.grace";
+        String filePath = args.length > 0 ? args[0] : "HelloWorld.grace";
         
         System.out.println("Starting compilation of: " + filePath);
         
