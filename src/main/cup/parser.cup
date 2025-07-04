@@ -30,6 +30,8 @@ non terminal Expr expr, func_call, l_value, cond;
 non terminal java.util.List<String> id_list;
 non terminal java.util.List<Expr> expr_list;
 non terminal String string_literal;
+non terminal java.util.List<Stmt> nested_def_list;
+non terminal java.util.List<Stmt> top_level_list;
 
 precedence left T_or;
 precedence left T_and;
@@ -41,21 +43,41 @@ precedence left T_OpBr, T_ClBr;
 
 start with program;
 
-program ::= func_def:fd             {: RESULT = new Program(Collections.singletonList(fd)); :}
-      ;
+// Top level can contain function declarations and definitions
+top_level_list ::= func_def:fd {: 
+    java.util.LinkedList<Stmt> l = new java.util.LinkedList<Stmt>();
+    l.add(fd);
+    RESULT = l;
+:}
+               | func_decl:fd {: 
+    java.util.LinkedList<Stmt> l = new java.util.LinkedList<Stmt>();
+    l.add(fd);
+    RESULT = l;
+:}
+               | top_level_list:tll func_def:fd {: 
+    tll.add(fd);
+    RESULT = tll;
+:}
+               | top_level_list:tll func_decl:fd {: 
+    tll.add(fd);
+    RESULT = tll;
+:}
+               ;
 
+program ::= top_level_list:tll      {: RESULT = new Program(tll); :}
+     ;
+
+// Function definition: header followed by zero or more local definitions and a block  
 func_def ::= header:h local_def_list:ldl block:b   {: 
     LinkedList<Decl> decls = new LinkedList<Decl>();
     LinkedList<Stmt> stmts = new LinkedList<Stmt>();
     
-    // Add parameters from header
+    // Parameters from header
     if (h instanceof Block) {
-        Block blk = (Block) h;
-        decls.addAll(blk.getDecls());
-        stmts.addAll(blk.getStmts());
+        decls.addAll(((Block) h).getDecls());
     }
     
-    // Add local definitions
+    // Local definitions (zero or more)
     for (Stmt s : ldl) {
         if (s instanceof Block) {
             Block blk = (Block) s;
@@ -66,13 +88,29 @@ func_def ::= header:h local_def_list:ldl block:b   {:
         }
     }
     
-    // Add main block
+    // Main block
     if (b instanceof Block) {
         Block blk = (Block) b;
         decls.addAll(blk.getDecls());
         stmts.addAll(blk.getStmts());
-    } else {
-        stmts.add(b);
+    }
+    
+    RESULT = new Block(decls, stmts);
+:}
+       | header:h block:b   {: 
+    LinkedList<Decl> decls = new LinkedList<Decl>();
+    LinkedList<Stmt> stmts = new LinkedList<Stmt>();
+    
+    // Parameters from header
+    if (h instanceof Block) {
+        decls.addAll(((Block) h).getDecls());
+    }
+    
+    // Main block
+    if (b instanceof Block) {
+        Block blk = (Block) b;
+        decls.addAll(blk.getDecls());
+        stmts.addAll(blk.getStmts());
     }
     
     RESULT = new Block(decls, stmts);
@@ -139,6 +177,7 @@ data_type ::= T_int                                   {: RESULT = BasicType.Int;
 
 type ::= data_type:dt                                 {: RESULT = dt; :}
    | data_type:dt T_OpBr T_ClBr                       {: RESULT = dt; :}
+   | data_type:dt T_OpBr T_num:n T_ClBr               {: RESULT = dt; :}
    ;
 
 ret_type ::= data_type:dt                             {: RESULT = dt; :}
@@ -165,8 +204,11 @@ stmt ::= T_semicolon                                               {: RESULT = n
        | T_return T_semicolon                                      {: RESULT = new Block(new LinkedList<Decl>(), new LinkedList<Stmt>()); :}
        ;
 
-block ::= T_OpCuBr stmt_list:sl T_ClCuBr              {: RESULT = new Block(new LinkedList<Decl>(), sl); :}
-    ;
+nested_def_list ::=                                     {: RESULT = new LinkedList<Stmt>(); :}
+           | nested_def_list:ndl func_decl:fd           {: ndl.add(fd); RESULT = ndl; :}
+           | nested_def_list:ndl func_def:fd            {: ndl.add(fd); RESULT = ndl; :}
+           | nested_def_list:ndl var_def:vd             {: ndl.add(vd); RESULT = ndl; :}
+           ;
 
 func_call ::= T_id:id T_lpar expr_list:el T_rpar      {: RESULT = new FuncCall(id, el); :}
         | T_id:id T_lpar T_rpar                       {: RESULT = new FuncCall(id, new LinkedList<Expr>()); :}
@@ -197,20 +239,20 @@ cond ::= T_lpar cond:c T_rpar                         {: RESULT = c; :}
        | cond:c1 T_and cond:c2                        {: RESULT = c1; :}
        | cond:c1 T_or cond:c2                         {: RESULT = c1; :}
        | expr:e1 T_assign expr:e2                     {: RESULT = new BinOp(BinOp.Operator.Eq, e1, e2); :}
+       | expr:e1 T_NotEq expr:e2                      {: RESULT = new BinOp(BinOp.Operator.NotEq, e1, e2); :}
        | expr:e1 T_Smaller expr:e2                    {: RESULT = new BinOp(BinOp.Operator.Less, e1, e2); :}
        | expr:e1 T_Bigger expr:e2                     {: RESULT = new BinOp(BinOp.Operator.Greater, e1, e2); :}
        | expr:e1 T_SmEQ expr:e2                       {: RESULT = new BinOp(BinOp.Operator.LessEq, e1, e2); :}
        | expr:e1 T_BigEq expr:e2                      {: RESULT = new BinOp(BinOp.Operator.GreaterEq, e1, e2); :}
-       | expr:e1 T_NotEq expr:e2                      {: RESULT = new BinOp(BinOp.Operator.NotEq, e1, e2); :}
        ;
-
-id_list ::= T_id:id                                   {: RESULT = new LinkedList<String>(); ((LinkedList<String>)RESULT).add(id); :}
-      | id_list:il T_coma T_id:id                     {: il.add(id); RESULT = il; :}
-      ;
 
 expr_list ::= expr:e                                  {: RESULT = new LinkedList<Expr>(); ((LinkedList<Expr>)RESULT).add(e); :}
         | expr_list:el T_coma expr:e                  {: el.add(e); RESULT = el; :}
         ;
 
-string_literal ::= T_DoQu T_id:id T_DoQu              {: RESULT = id; :}
+id_list ::= T_id:id                                   {: RESULT = new LinkedList<String>(); ((LinkedList<String>)RESULT).add(id); :}
+      | id_list:il T_coma T_id:id                     {: il.add(id); RESULT = il; :}
+      ;
+
+string_literal ::= T_string:s                        {: RESULT = s; :}
              ;

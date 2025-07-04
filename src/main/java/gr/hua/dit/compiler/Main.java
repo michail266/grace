@@ -8,18 +8,23 @@ public class Main {
     public static void main(String[] args) {
         String filePath = "test.grace";
         
+        System.out.println("Starting compilation of: " + filePath);
+        
         try {
             Reader r = new FileReader(filePath);
             Lexer l = new Lexer(r);
             Parser p = new Parser(l);
 
+            System.out.println("Parsing...");
             Program result = (Program) p.parse().value;
+            System.out.println("Semantic analysis...");
             result.sem();
             
             System.out.println("Compilation successful");
             
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
             System.exit(1);
         }
     }
