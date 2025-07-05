@@ -1,5 +1,6 @@
 package gr.hua.dit.compiler.ast;
 
+import gr.hua.dit.compiler.CompileContext;
 import gr.hua.dit.compiler.errors.SemanticException;
 import gr.hua.dit.compiler.Symbol.SymbolTable;
 
@@ -16,5 +17,9 @@ public class FuncCallStmt extends Stmt {
   
   public void sem(SymbolTable tbl) throws SemanticException {
     funcCall.sem(tbl);
+  }
+  
+  public void compile(CompileContext context) {
+    funcCall.compile(context);
   }
 }

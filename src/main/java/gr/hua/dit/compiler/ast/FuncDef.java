@@ -57,10 +57,58 @@ public class FuncDef extends Stmt {
     }
     
     public void compile(CompileContext context) {
-        // Only compile the main function for now
-        if ("main".equals(name)) {
-            // Compile the function body
+        compile(context, false);
+    }
+    
+    public void compile(CompileContext context, boolean skipNestedFunctions) {
+        // Build method descriptor based on parameters
+        StringBuilder descriptor = new StringBuilder("(");
+        for (Decl param : params) {
+            // Check parameter type
+            if (param.getType() instanceof gr.hua.dit.compiler.types.ArrayType) {
+                descriptor.append("Ljava/lang/String;"); // char[] becomes String
+            } else {
+                descriptor.append("I"); // int parameter
+            }
+        }
+        descriptor.append(")V");
+        
+        // Create a method for each function
+        org.objectweb.asm.tree.MethodNode mn = new org.objectweb.asm.tree.MethodNode(
+            org.objectweb.asm.Opcodes.ACC_PUBLIC + org.objectweb.asm.Opcodes.ACC_STATIC,
+            name,
+            descriptor.toString(),
+            null,
+            null
+        );
+        
+        // Save current method and set new one
+        org.objectweb.asm.tree.MethodNode oldMethod = context.getMainNode();
+        context.setMainNode(mn);
+        
+        // Compile the function body
+        if (skipNestedFunctions) {
+            // Compile only the statements that are not FuncDef
+            for (Stmt stmt : body.getStmts()) {
+                if (!(stmt instanceof FuncDef)) {
+                    stmt.compile(context);
+                }
+            }
+        } else {
             body.compile(context);
         }
+        
+        // Add return instruction
+        context.addInsn(new org.objectweb.asm.tree.InsnNode(org.objectweb.asm.Opcodes.RETURN));
+        
+        // Set method limits
+        mn.maxLocals = context.getNumberOfTemps() + params.size();
+        mn.maxStack = 128;
+        
+        // Add method to class
+        context.getClassNode().methods.add(mn);
+        
+        // Restore previous method
+        context.setMainNode(oldMethod);
     }
 }

@@ -1,5 +1,9 @@
 package gr.hua.dit.compiler.ast;
 
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.IntInsnNode;
+import gr.hua.dit.compiler.CompileContext;
 import gr.hua.dit.compiler.Symbol.SymbolEntry;
 import gr.hua.dit.compiler.Symbol.SymbolTable;
 import gr.hua.dit.compiler.errors.SemanticException;
@@ -33,6 +37,33 @@ public class Assignment extends Stmt {
             throw new TypeException("Type mismatch in assignment: " +
                                     "Got: " + rvalue.getType() + ", " +
                                     "Expected: " + lvalue.getType());
+        }
+    }
+    
+    public void compile(CompileContext context) {
+        // For now, handle simple variable assignment to global array
+        if (lvalue instanceof Id) {
+            Id id = (Id) lvalue;
+            
+            // Get the variable index (simple hash for now)
+            int varIndex = Math.abs(id.getName().hashCode()) % 100;
+            
+            // Get global array reference
+            context.addInsn(new FieldInsnNode(
+                Opcodes.GETSTATIC,
+                "MiniBasic",
+                "theVars",
+                "[I"
+            ));
+            
+            // Push array index
+            context.addInsn(new IntInsnNode(Opcodes.BIPUSH, varIndex));
+            
+            // Compile the right-hand side expression
+            rvalue.compile(context);
+            
+            // Store in array
+            context.addInsn(new org.objectweb.asm.tree.InsnNode(Opcodes.IASTORE));
         }
     }
     

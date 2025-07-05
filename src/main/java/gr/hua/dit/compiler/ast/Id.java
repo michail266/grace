@@ -3,7 +3,6 @@ package gr.hua.dit.compiler.ast;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.VarInsnNode;
 
 import gr.hua.dit.compiler.CompileContext;
 import gr.hua.dit.compiler.Symbol.SymbolEntry;
@@ -18,6 +17,8 @@ public class Id extends Expr {
   }
 
   public String toString() { return "Id(" + name + ")"; }
+  
+  public String getName() { return name; }
 
   public void sem(SymbolTable tbl) throws SemanticException {
     SymbolEntry e = tbl.lookupRec(name);
@@ -31,12 +32,22 @@ public class Id extends Expr {
   public String getId() {
     return name;
   }
-    public void compile(CompileContext context) {
-//    context.getMainNode().instructions.add(
-//      new VarInsnNode(Opcodes.ILOAD, this.name.charAt(0) - 'a'));
-      context.addInsn(new FieldInsnNode(Opcodes.GETSTATIC, context.getClassNode().name, "theVars", "[I")
-      );
-      context.addInsn(new VarInsnNode(Opcodes.BIPUSH, this.name.charAt(0) - 'a'));
-      context.addInsn(new InsnNode(Opcodes.IALOAD));
+  public void compile(CompileContext context) {
+    // Get the variable index (consistent with Assignment.java)
+    int varIndex = Math.abs(this.name.hashCode()) % 100;
+    
+    // Get global array reference
+    context.addInsn(new FieldInsnNode(
+      Opcodes.GETSTATIC, 
+      "MiniBasic", 
+      "theVars", 
+      "[I"
+    ));
+    
+    // Push array index  
+    context.addInsn(new org.objectweb.asm.tree.IntInsnNode(Opcodes.BIPUSH, varIndex));
+    
+    // Load from array
+    context.addInsn(new InsnNode(Opcodes.IALOAD));
   }
 }

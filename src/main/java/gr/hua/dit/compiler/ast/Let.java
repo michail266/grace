@@ -4,7 +4,6 @@ package gr.hua.dit.compiler.ast;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.VarInsnNode;
 
 import gr.hua.dit.compiler.CompileContext;
 import gr.hua.dit.compiler.Symbol.SymbolEntry;
@@ -34,15 +33,25 @@ public class Let extends Stmt {
       throw new TypeException("Variable '" + id + "' not declared");
     }
   }
-    public void compile(CompileContext context) {
-      context.addInsn(
-        new FieldInsnNode(Opcodes.GETSTATIC, context.getClassNode().name, "theVars", "[I")
-      );
-      context.addInsn(new VarInsnNode(Opcodes.BIPUSH, this.id.charAt(0) - 'a'));
-      e.compile(context);
-      context.addInsn(new InsnNode(Opcodes.IASTORE));
-
-//      context.getMainNode().instructions.add(
-//        new VarInsnNode(Opcodes.ISTORE, this.id.charAt(0) - 'a'));
+  public void compile(CompileContext context) {
+    // Get the variable index (consistent with Id.java)
+    int varIndex = Math.abs(this.id.hashCode()) % 100;
+    
+    // Get global array reference
+    context.addInsn(new FieldInsnNode(
+      Opcodes.GETSTATIC, 
+      "MiniBasic", 
+      "theVars", 
+      "[I"
+    ));
+    
+    // Push array index
+    context.addInsn(new org.objectweb.asm.tree.IntInsnNode(Opcodes.BIPUSH, varIndex));
+    
+    // Compile the right-hand side expression
+    e.compile(context);
+    
+    // Store in array
+    context.addInsn(new InsnNode(Opcodes.IASTORE));
   }
 }

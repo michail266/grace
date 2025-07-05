@@ -1,5 +1,8 @@
 package gr.hua.dit.compiler.ast;
 
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.MethodInsnNode;
+import gr.hua.dit.compiler.CompileContext;
 import gr.hua.dit.compiler.errors.SemanticException;
 import gr.hua.dit.compiler.Symbol.SymbolEntry;
 import gr.hua.dit.compiler.Symbol.SymbolTable;
@@ -42,5 +45,38 @@ public class FuncCall extends Expr {
     } else {
       throw new SemanticException("Function '" + functionName + "' not declared");
     }
+  }
+
+  public void compile(CompileContext context) {
+    // Handle built-in functions
+    if ("geti".equals(functionName)) {
+      // For now, just return a fixed value (we'd need Scanner for real input)
+      context.addInsn(new org.objectweb.asm.tree.IntInsnNode(org.objectweb.asm.Opcodes.BIPUSH, 3));
+      return;
+    }
+    
+    // Compile arguments first
+    for (Expr arg : args) {
+      arg.compile(context);
+    }
+    
+    // Build method descriptor based on actual argument types
+    StringBuilder descriptor = new StringBuilder("(");
+    for (Expr arg : args) {
+      if (arg instanceof StringLiteral) {
+        descriptor.append("Ljava/lang/String;"); // String parameter
+      } else {
+        descriptor.append("I"); // Int parameter
+      }
+    }
+    descriptor.append(")V");
+    
+    // Call static method
+    context.addInsn(new MethodInsnNode(
+      Opcodes.INVOKESTATIC,
+      "MiniBasic",
+      functionName,
+      descriptor.toString()
+    ));
   }
 }

@@ -2,6 +2,8 @@ package gr.hua.dit.compiler.ast;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.JumpInsnNode;
+import org.objectweb.asm.tree.LabelNode;
 
 import gr.hua.dit.compiler.CompileContext;
 import gr.hua.dit.compiler.Symbol.SymbolTable;
@@ -83,7 +85,15 @@ public class BinOp extends Expr {
         // TODO: Add greater than comparison bytecode
         break;
       case GreaterEq:
-        // TODO: Add greater than or equal comparison bytecode
+        // For >= comparison: push 1 if left >= right, else 0
+        LabelNode trueLabel = new LabelNode();
+        LabelNode endLabel = new LabelNode();
+        context.addInsn(new JumpInsnNode(Opcodes.IF_ICMPGE, trueLabel));
+        context.addInsn(new InsnNode(Opcodes.ICONST_0)); // Push 0 (false)
+        context.addInsn(new JumpInsnNode(Opcodes.GOTO, endLabel));
+        context.addInsn(trueLabel);
+        context.addInsn(new InsnNode(Opcodes.ICONST_1)); // Push 1 (true)
+        context.addInsn(endLabel);
         break;
     }
   }
