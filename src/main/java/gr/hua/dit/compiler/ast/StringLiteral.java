@@ -2,6 +2,7 @@ package gr.hua.dit.compiler.ast;
 
 import gr.hua.dit.compiler.Symbol.SymbolTable;
 import gr.hua.dit.compiler.types.BasicType;
+import gr.hua.dit.compiler.types.ArrayType;
 
 public class StringLiteral extends Expr {
     private String value;
@@ -21,7 +22,7 @@ public class StringLiteral extends Expr {
     
     @Override
     public void sem(SymbolTable symbolTable) {
-        type = BasicType.Char; // Strings are arrays of char
+        type = new ArrayType(BasicType.Char); // Strings are arrays of char
     }
     
     @Override

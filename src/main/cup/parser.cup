@@ -7,12 +7,12 @@ import gr.hua.dit.compiler.ast.*;
 import gr.hua.dit.compiler.Symbol.*;
 
 terminal T_plus, T_times, T_lpar, T_rpar, T_if, T_then, T_else, T_int, T_char;
-terminal T_assign, T_let, T_print, T_prints, T_puts, T_coma, T_geti, T_puti;
+terminal T_assign, T_let, T_print, T_prints, T_puts, T_coma, T_geti, T_puti, T_strlen;
 terminal T_minus, T_while, T_dot, T_colon, T_semicolon, T_Smaller, T_Bigger, T_OpBr;
 terminal T_ClBr, T_OpCuBr, T_ClCuBr, T_Insert, T_SmEQ, T_BigEq, T_do, T_or, T_and, T_div, T_NotEq;
 terminal T_fun, T_mod, T_not, T_ref, T_var, T_return, T_nothing, T_DoQu, T_SiQu;
 terminal Integer T_num;
-terminal java.lang.String T_id, T_string;
+terminal java.lang.String T_id, T_string, T_char_literal;
 
 non terminal Program program;
 non terminal Stmt func_def;
@@ -94,12 +94,18 @@ func_def ::= header:h local_def_list:ldl block:b   {:
         decls.addAll(((Block) h).getDecls());
     }
     
-    // Local definitions (zero or more)
+    // Local definitions (zero or more) - don't flatten nested functions
     for (Stmt s : ldl) {
         if (s instanceof Block) {
             Block blk = (Block) s;
-            decls.addAll(blk.getDecls());
-            stmts.addAll(blk.getStmts());
+            // Only add declarations from var_def, not from nested functions
+            if (blk.getStmts().isEmpty()) {
+                // This is a variable definition (var_def creates empty statement list)
+                decls.addAll(blk.getDecls());
+            } else {
+                // This is a function definition - keep as statement
+                stmts.add(s);
+            }
         } else {
             stmts.add(s);
         }
@@ -194,8 +200,8 @@ data_type ::= T_int                                   {: RESULT = BasicType.Int;
         ;
 
 type ::= data_type:dt                                 {: RESULT = dt; :}
-   | data_type:dt T_OpBr T_ClBr                       {: RESULT = dt; :}
-   | data_type:dt T_OpBr T_num:n T_ClBr               {: RESULT = dt; :}
+   | data_type:dt T_OpBr T_ClBr                       {: RESULT = new ArrayType(dt); :}
+   | data_type:dt T_OpBr T_num:n T_ClBr               {: RESULT = new ArrayType(dt); :}
    ;
 
 ret_type ::= data_type:dt                             {: RESULT = dt; :}
@@ -203,7 +209,7 @@ ret_type ::= data_type:dt                             {: RESULT = dt; :}
        ;
 
 fpar_type ::= data_type:dt                            {: RESULT = dt; :}
-        | data_type:dt T_OpBr T_ClBr                  {: RESULT = dt; :}
+        | data_type:dt T_OpBr T_ClBr                  {: RESULT = new ArrayType(dt); :}
         ;
 
 block ::= T_OpCuBr T_ClCuBr                          {: RESULT = new Block(new LinkedList<Decl>(), new LinkedList<Stmt>()); :}
@@ -224,7 +230,13 @@ block ::= T_OpCuBr T_ClCuBr                          {: RESULT = new Block(new L
         ;
 
 stmt ::= T_semicolon                                               {: RESULT = new Block(new LinkedList<Decl>(), new LinkedList<Stmt>()); :}
-       | l_value:lv T_Insert expr:e T_semicolon                    {: RESULT = new Let(((Id)lv).getId(), e); :}
+       | l_value:lv T_Insert expr:e T_semicolon                    {: 
+           if (lv instanceof Id) {
+               RESULT = new Let(((Id)lv).getId(), e);
+           } else {
+               RESULT = new Assignment(lv, e);
+           }
+       :}
        | block:b                                                   {: RESULT = b; :}
        | func_call:fc T_semicolon                                  {: RESULT = new FuncCallStmt((FuncCall)fc); :}
        | T_puts T_lpar expr:e T_rpar T_semicolon                   {: RESULT = new Print(e); :}
@@ -241,14 +253,16 @@ func_call ::= T_id:id T_lpar expr_list:el T_rpar      {: RESULT = new FuncCall(i
         ;
 
 l_value ::= T_id:id                                   {: RESULT = new Id(id); :}
-      | l_value:lv T_OpBr expr:e T_ClBr               {: RESULT = lv; :}
+      | l_value:lv T_OpBr expr:e T_ClBr               {: RESULT = new ArrayAccess(lv, e); :}
       ;
 
 expr ::= T_num:n                                      {: RESULT = new NumConst(n); :}
        | T_string:s                                   {: RESULT = new StringLiteral(s); :}
+       | T_char_literal:c                             {: RESULT = new CharLiteral(c); :}
        | l_value:lv                                   {: RESULT = lv; :}
        | func_call:fc                                 {: RESULT = fc; :}
        | T_geti T_lpar T_rpar                         {: RESULT = new FuncCall("geti", new LinkedList<Expr>()); :}
+       | T_strlen T_lpar expr:e T_rpar                {: RESULT = new FuncCall("strlen", Collections.singletonList(e)); :}
        | T_lpar expr:e T_rpar                         {: RESULT = e; :}
        | T_plus expr:e                                {: RESULT = e; :}
        | T_minus expr:e                               {: RESULT = e; :}

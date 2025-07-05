@@ -27,7 +27,7 @@ public class Let extends Stmt {
 
   public void sem(SymbolTable tbl) throws SemanticException{
     // get type of id;
-    SymbolEntry entry = tbl.lookup(id);
+    SymbolEntry entry = tbl.lookupRec(id);
     if (entry != null) {
       e.typeCheck(tbl,entry.getType());
     } else {

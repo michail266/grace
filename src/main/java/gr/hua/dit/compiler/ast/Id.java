@@ -20,7 +20,7 @@ public class Id extends Expr {
   public String toString() { return "Id(" + name + ")"; }
 
   public void sem(SymbolTable tbl) throws SemanticException {
-    SymbolEntry e = tbl.lookup(name);
+    SymbolEntry e = tbl.lookupRec(name);
     if (e != null) {
       type = e.getType();
     } else {
