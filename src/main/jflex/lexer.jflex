@@ -64,6 +64,7 @@ chr   =      \'([^\'\\]|\\[0ntr\'\"\\])\'
 "<"             { return createSymbol(Symbols.T_Smaller); }
 ">"             { return createSymbol(Symbols.T_Bigger); }
 "="             { return createSymbol(Symbols.T_assign); }
+"#"             { return createSymbol(Symbols.T_NotEq); }
 "let"           { return createSymbol(Symbols.T_let); }
 "("             { return createSymbol(Symbols.T_lpar); }
 ")"             { return createSymbol(Symbols.T_rpar); }

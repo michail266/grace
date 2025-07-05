@@ -32,7 +32,7 @@ public class Block extends Stmt {
     }
     
     try {
-      // Process declarations first (function parameters)
+      // Process declarations first (function parameters and variables)
       for (Decl d : decls) {
         d.sem(tbl);
       }

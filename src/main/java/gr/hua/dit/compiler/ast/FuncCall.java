@@ -39,6 +39,8 @@ public class FuncCall extends Expr {
         }
       }
       type = funcType.getResult();
+    } else {
+      throw new SemanticException("Function '" + functionName + "' not declared");
     }
   }
 }
