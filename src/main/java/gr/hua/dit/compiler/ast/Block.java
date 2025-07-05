@@ -3,14 +3,16 @@ package gr.hua.dit.compiler.ast;
 import java.util.List;
 import java.util.StringJoiner;
 
+import gr.hua.dit.compiler.CompileContext;
+import gr.hua.dit.compiler.Symbol.SymbolTable;
 import gr.hua.dit.compiler.errors.SemanticException;
-import gr.hua.dit.compiler.Symbol.*;
 
 public class Block extends Stmt {
   private List<Stmt> stmts;
   private List<Decl> decls;
 
   public Block(List<Decl> decls, List<Stmt> stmts) {
+    this.decls = decls;
     this.stmts = stmts;
   }
 
@@ -22,9 +24,21 @@ public class Block extends Stmt {
   }
 
   public void sem(SymbolTable tbl) throws SemanticException {
-    tbl.openScope();
+    // Don't open new scope for blocks - variables should be function-scoped in Grace
     for (Decl d : decls) d.sem(tbl);
     for (Stmt s : stmts) s.sem(tbl);
-    tbl.closeScope();
+  }
+
+  public List<Decl> getDecls() {
+    return decls;
+  }
+
+  public List<Stmt> getStmts() {
+    return stmts;
+  }
+    public void compile(CompileContext context) {
+    for (Stmt s : stmts) {
+      s.compile(context);
+    }
   }
 }

@@ -5,6 +5,7 @@ import gr.hua.dit.compiler.Symbol.SymbolEntry;
 import gr.hua.dit.compiler.Symbol.SymbolTable;
 import gr.hua.dit.compiler.types.FuncType;
 import gr.hua.dit.compiler.types.Type;
+import gr.hua.dit.compiler.types.BasicType;
 
 import java.util.List;
 
@@ -20,6 +21,12 @@ public class FuncCall extends Expr {
   }
 
   public void sem(SymbolTable tbl) throws SemanticException {
+    // Handle built-in functions
+    if ("geti".equals(functionName)) {
+      type = BasicType.Int;
+      return;
+    }
+    
     SymbolEntry e = tbl.lookup(functionName);
 
     if (e != null) {
