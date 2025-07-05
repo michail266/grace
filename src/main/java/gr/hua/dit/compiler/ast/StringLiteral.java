@@ -1,5 +1,6 @@
 package gr.hua.dit.compiler.ast;
 
+import gr.hua.dit.compiler.CompileContext;
 import gr.hua.dit.compiler.Symbol.SymbolTable;
 import gr.hua.dit.compiler.types.BasicType;
 
@@ -27,5 +28,10 @@ public class StringLiteral extends Expr {
     @Override
     public String toString() {
         return "StringLiteral(" + value + ")";
+    }
+    @Override
+    public void compile(CompileContext context) {
+        // Push a JVM string constant to the stack (e.g., "Hello World")
+        context.addLdcInsn(value);
     }
 }

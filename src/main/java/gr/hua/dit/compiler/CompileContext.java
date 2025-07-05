@@ -4,6 +4,7 @@ import gr.hua.dit.compiler.Symbol.SymbolTable;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 
@@ -60,6 +61,13 @@ public class CompileContext {
     nextTemp++;
     return nextTemp - 1;
   }
+  public void addLdcInsn(Object cst) {
+    if (mainNode == null) {
+        throw new IllegalStateException("Main method is not set");
+    }
+    mainNode.instructions.add(new LdcInsnNode(cst));
+}
+
 
   public int getNumberOfTemps() {
     return nextTemp + 1;

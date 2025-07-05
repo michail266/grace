@@ -12,14 +12,31 @@ public class Print extends Stmt {
 
   public String toString() { return "Print(" + e + ")"; }
 
-    public void compile(CompileContext context) {
-    context.addInsn(new FieldInsnNode(Opcodes.GETSTATIC,
-      "java/lang/System", "out", "Ljava/io/PrintStream;"
+public void compile(CompileContext context) {
+    // Get System.out
+    context.addInsn(new FieldInsnNode(
+        Opcodes.GETSTATIC,
+        "java/lang/System",
+        "out",
+        "Ljava/io/PrintStream;"
     ));
+
+    // Compile the expression (either int or string)
     e.compile(context);
-    context.addInsn(
-      new MethodInsnNode(Opcodes.INVOKEVIRTUAL,
-        "java/io/PrintStream", "println", "(I)V"));
-  }
-  
+
+    // Decide println descriptor based on Expr type
+    String descriptor;
+    if (e instanceof StringLiteral) {
+        descriptor = "(Ljava/lang/String;)V";
+    } else {
+        descriptor = "(I)V";  // Default to int
+    }
+
+    context.addInsn(new MethodInsnNode(
+        Opcodes.INVOKEVIRTUAL,
+        "java/io/PrintStream",
+        "println",
+        descriptor
+    ));
+}
 }
