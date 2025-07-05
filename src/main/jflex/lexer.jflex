@@ -29,9 +29,10 @@ import java_cup.runtime.Symbol;
 
 delim =      [ \t\r\n]
 ws    =      {delim}
-l     =      [A-Za-z][A-Za-z0-9_-]*
+l     =      [A-Za-z][A-Za-z0-9_]*
 d     =      [0-9]
 str   =      \"[^\"]*\"
+chr   =      \'([^\'\\]|\\[0ntr\'\"\\])\'
 %%
 
 "if"            { return createSymbol(Symbols.T_if); }
@@ -63,6 +64,7 @@ str   =      \"[^\"]*\"
 "<"             { return createSymbol(Symbols.T_Smaller); }
 ">"             { return createSymbol(Symbols.T_Bigger); }
 "="             { return createSymbol(Symbols.T_assign); }
+"#"             { return createSymbol(Symbols.T_NotEq); }
 "let"           { return createSymbol(Symbols.T_let); }
 "("             { return createSymbol(Symbols.T_lpar); }
 ")"             { return createSymbol(Symbols.T_rpar); }
@@ -78,6 +80,7 @@ str   =      \"[^\"]*\"
 "puti"          { return createSymbol(Symbols.T_puti); }
 "prints"        { return createSymbol(Symbols.T_prints); }
 "print"         { return createSymbol(Symbols.T_print); }
+"strlen"        { return createSymbol(Symbols.T_strlen); }
 "#"             { return createSymbol(Symbols.T_NotEq); }
 
 
@@ -85,6 +88,7 @@ str   =      \"[^\"]*\"
 {d}+            { return createSymbol(Symbols.T_num, Integer.valueOf(yytext())); }
 {l}+            { return createSymbol(Symbols.T_id, yytext()); }
 {str}           { return createSymbol(Symbols.T_string, yytext()); }
+{chr}           { return createSymbol(Symbols.T_char_literal, yytext()); }
 
 \$.*            {}
 "$$"([^$]|\$[^\$])*"$$"      {}

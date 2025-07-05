@@ -27,7 +27,7 @@ public class FuncCall extends Expr {
       return;
     }
     
-    SymbolEntry e = tbl.lookup(functionName);
+    SymbolEntry e = tbl.lookupRec(functionName);
 
     if (e != null) {
       FuncType funcType = (FuncType) e.getType();
@@ -39,6 +39,8 @@ public class FuncCall extends Expr {
         }
       }
       type = funcType.getResult();
+    } else {
+      throw new SemanticException("Function '" + functionName + "' not declared");
     }
   }
 }

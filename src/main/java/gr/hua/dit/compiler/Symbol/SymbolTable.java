@@ -5,6 +5,9 @@ import java.util.Deque;
 import java.util.LinkedList;
 
 import gr.hua.dit.compiler.types.Type;
+import gr.hua.dit.compiler.types.BasicType;
+import gr.hua.dit.compiler.types.FuncType;
+import gr.hua.dit.compiler.types.ArrayType;
 
 public class SymbolTable {
 
@@ -13,6 +16,23 @@ public class SymbolTable {
 
         // enter the initial scope
         openScope();
+        
+        // Add built-in functions
+        addBuiltinFunctions();
+    }
+    
+    private void addBuiltinFunctions() {
+        // strlen function: takes char[] and returns int
+        addEntry("strlen", new FuncType(java.util.Arrays.asList((Type)new ArrayType(BasicType.Char)), BasicType.Int));
+        
+        // puts function: takes char[] and returns nothing
+        addEntry("puts", new FuncType(java.util.Arrays.asList((Type)new ArrayType(BasicType.Char)), null));
+        
+        // geti function: takes nothing and returns int
+        addEntry("geti", new FuncType(java.util.Collections.emptyList(), BasicType.Int));
+        
+        // puti function: takes int and returns nothing
+        addEntry("puti", new FuncType(java.util.Arrays.asList((Type)BasicType.Int), null));
     }
 
     public SymbolEntry lookup(String sym) {

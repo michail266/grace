@@ -36,6 +36,11 @@ public class BinOp extends Expr {
   public String toString() { return op + "(" + l + "," + r + ")"; }
 
   public void sem(SymbolTable tbl) throws SemanticException {
+    // First, perform semantic analysis on operands
+    l.sem(tbl);
+    r.sem(tbl);
+    
+    // Then perform type checking
     l.typeCheck(tbl, BasicType.Int);
     r.typeCheck(tbl, BasicType.Int);
     
@@ -58,6 +63,27 @@ public class BinOp extends Expr {
         break;
       case Div:
         context.addInsn(new InsnNode(Opcodes.IDIV));
+        break;
+      case Mod:
+        context.addInsn(new InsnNode(Opcodes.IREM));
+        break;
+      case Eq:
+        // TODO: Add equality comparison bytecode
+        break;
+      case NotEq:
+        // TODO: Add not equal comparison bytecode
+        break;
+      case Less:
+        // TODO: Add less than comparison bytecode
+        break;
+      case LessEq:
+        // TODO: Add less than or equal comparison bytecode
+        break;
+      case Greater:
+        // TODO: Add greater than comparison bytecode
+        break;
+      case GreaterEq:
+        // TODO: Add greater than or equal comparison bytecode
         break;
     }
   }

@@ -24,9 +24,29 @@ public class Block extends Stmt {
   }
 
   public void sem(SymbolTable tbl) throws SemanticException {
-    // Don't open new scope for blocks - variables should be function-scoped in Grace
-    for (Decl d : decls) d.sem(tbl);
-    for (Stmt s : stmts) s.sem(tbl);
+    // Always open new scope for blocks that have declarations (function definitions)
+    boolean openedScope = false;
+    if (!decls.isEmpty()) {
+      tbl.openScope();
+      openedScope = true;
+    }
+    
+    try {
+      // Process declarations first (function parameters and variables)
+      for (Decl d : decls) {
+        d.sem(tbl);
+      }
+      
+      // Then process statements (function body)
+      for (Stmt s : stmts) {
+        s.sem(tbl);
+      }
+    } finally {
+      // Always close scope if we opened one
+      if (openedScope) {
+        tbl.closeScope();
+      }
+    }
   }
 
   public List<Decl> getDecls() {

@@ -15,6 +15,9 @@ public class Decl extends ASTNode {
     }
 
     public String toString() { return "Decl(" + id + "," + type + ")"; }
+    
+    public String getId() { return id; }
+    public Type getType() { return type; }
 
     public void sem(SymbolTable tbl) {
       tbl.addEntry(id, type);
