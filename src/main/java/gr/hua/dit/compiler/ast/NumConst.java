@@ -2,7 +2,7 @@ package gr.hua.dit.compiler.ast;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.VarInsnNode;
+import org.objectweb.asm.tree.IntInsnNode;
 
 import gr.hua.dit.compiler.CompileContext;
 import gr.hua.dit.compiler.Symbol.SymbolTable;
@@ -33,9 +33,9 @@ public class NumConst extends Expr {
       }
 
     } else if (this.value < 128 && this.value >= -128) {
-      context.addInsn(new VarInsnNode(Opcodes.BIPUSH, this.value));
+      context.addInsn(new IntInsnNode(Opcodes.BIPUSH, this.value));
     } else {
-      context.addInsn(new VarInsnNode(Opcodes.SIPUSH, this.value));
+      context.addInsn(new IntInsnNode(Opcodes.SIPUSH, this.value));
     }
 
   }

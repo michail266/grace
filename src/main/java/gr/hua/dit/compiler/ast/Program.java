@@ -10,12 +10,9 @@ import java.util.StringJoiner;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 import gr.hua.dit.compiler.CompileContext;
@@ -64,26 +61,7 @@ public class Program  extends ASTNode {
               "theVars", "[I" , null, null));
 
     MethodNode mn;
-    {
 
-      mn = new MethodNode(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
-      mn.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
-      mn.instructions.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V"));
-      mn.instructions.add(new InsnNode(Opcodes.RETURN));
-      mn.maxLocals = 1;
-      mn.maxStack = 1;
-      cn.methods.add(mn);
-    }
-    {
-      mn = new MethodNode(Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
-      mn.instructions.add(new VarInsnNode(Opcodes.BIPUSH, 25));
-      mn.instructions.add(new VarInsnNode(Opcodes.NEWARRAY, Opcodes.T_INT));
-      mn.instructions.add(new FieldInsnNode(Opcodes.PUTSTATIC, cn.name, "theVars", "[I"));
-      mn.instructions.add(new InsnNode(Opcodes.RETURN));
-      mn.maxLocals = 1;
-      mn.maxStack = 1;
-      cn.methods.add(mn);
-    }
 
     context.setClassNode(cn);
 

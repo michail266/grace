@@ -8,7 +8,7 @@ import gr.hua.dit.compiler.ast.Program;
 public class Main {
 
     public static void main(String[] args) {
-        String filePath = args.length > 0 ? args[0] : "minimal_test.grace";
+        String filePath = args.length > 0 ? args[0] : "simple_main.grace";
         
         System.out.println("Starting compilation of: " + filePath);
         
@@ -21,7 +21,7 @@ public class Main {
             Program result = (Program) p.parse().value;
             System.out.println("Semantic analysis...");
             result.sem();
-            
+            result.compile();
             System.out.println("Compilation successful");
             
         } catch (Exception e) {
