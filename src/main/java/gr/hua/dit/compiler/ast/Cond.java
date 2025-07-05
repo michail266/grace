@@ -18,7 +18,7 @@ public class Cond extends ASTNode {
   public Cond(Expr e) { this.e = e; }
 
   public void typeCheck(SymbolTable tbl, Type t) throws SemanticException {
-    // analysis will populate the inferred type of Expr
+    // analysis sets the type of Expr
     sem(tbl);
     e.sem(tbl);
     if (e.getType().equals(t)) {

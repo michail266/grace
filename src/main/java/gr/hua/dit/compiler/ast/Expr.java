@@ -11,7 +11,7 @@ public abstract class Expr extends ASTNode {
 
   // check if expression is well-typed
   public void typeCheck(SymbolTable tbl, Type t) throws SemanticException {
-    // analysis will populate the inferred type of Expr
+    // type will be set during analysis
     sem(tbl);
     if (!getType().equals(t)) {
       throw new TypeException("Type mismatch: " +
