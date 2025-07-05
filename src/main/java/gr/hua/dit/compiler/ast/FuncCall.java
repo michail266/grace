@@ -5,6 +5,7 @@ import gr.hua.dit.compiler.Symbol.SymbolEntry;
 import gr.hua.dit.compiler.Symbol.SymbolTable;
 import gr.hua.dit.compiler.types.FuncType;
 import gr.hua.dit.compiler.types.Type;
+import gr.hua.dit.compiler.types.BasicType;
 
 import java.util.List;
 
@@ -20,7 +21,13 @@ public class FuncCall extends Expr {
   }
 
   public void sem(SymbolTable tbl) throws SemanticException {
-    SymbolEntry e = tbl.lookup(functionName);
+    // Handle built-in functions
+    if ("geti".equals(functionName)) {
+      type = BasicType.Int;
+      return;
+    }
+    
+    SymbolEntry e = tbl.lookupRec(functionName);
 
     if (e != null) {
       FuncType funcType = (FuncType) e.getType();
@@ -32,6 +39,8 @@ public class FuncCall extends Expr {
         }
       }
       type = funcType.getResult();
+    } else {
+      throw new SemanticException("Function '" + functionName + "' not declared");
     }
   }
 }

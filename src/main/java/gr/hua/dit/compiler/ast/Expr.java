@@ -13,7 +13,7 @@ public abstract class Expr extends ASTNode {
   public void typeCheck(SymbolTable tbl, Type t) throws SemanticException {
     // analysis will populate the inferred type of Expr
     sem(tbl);
-    if (getType().equals(t)) {
+    if (!getType().equals(t)) {
       throw new TypeException("Type mismatch: " +
                               "Got: " + getType() + ", " +
                               "Expected: " + t);

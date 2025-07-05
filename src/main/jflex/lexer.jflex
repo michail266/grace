@@ -29,8 +29,10 @@ import java_cup.runtime.Symbol;
 
 delim =      [ \t\r\n]
 ws    =      {delim}
-l     =      [A-Za-z][A-Za-z0-9_-]*
+l     =      [A-Za-z][A-Za-z0-9_]*
 d     =      [0-9]
+str   =      \"[^\"]*\"
+chr   =      \'([^\'\\]|\\[0ntr\'\"\\])\'
 %%
 
 "if"            { return createSymbol(Symbols.T_if); }
@@ -46,6 +48,8 @@ d     =      [0-9]
 "var"           { return createSymbol(Symbols.T_var); }
 "nothing"       { return createSymbol(Symbols.T_nothing); }
 "fun"           { return createSymbol(Symbols.T_fun); }
+"int"           { return createSymbol(Symbols.T_int); }
+"char"          { return createSymbol(Symbols.T_char); }
 ":"             { return createSymbol(Symbols.T_colon); }
 ";"             { return createSymbol(Symbols.T_semicolon); }
 ","             { return createSymbol(Symbols.T_coma); }
@@ -60,6 +64,7 @@ d     =      [0-9]
 "<"             { return createSymbol(Symbols.T_Smaller); }
 ">"             { return createSymbol(Symbols.T_Bigger); }
 "="             { return createSymbol(Symbols.T_assign); }
+"#"             { return createSymbol(Symbols.T_NotEq); }
 "let"           { return createSymbol(Symbols.T_let); }
 "("             { return createSymbol(Symbols.T_lpar); }
 ")"             { return createSymbol(Symbols.T_rpar); }
@@ -70,14 +75,20 @@ d     =      [0-9]
 "\""            { return createSymbol(Symbols.T_DoQu); }
 "div"           { return createSymbol(Symbols.T_div); }
 "mod"           { return createSymbol(Symbols.T_mod); }
+"geti"          { return createSymbol(Symbols.T_geti); }
+"puts"          { return createSymbol(Symbols.T_puts); }
+"puti"          { return createSymbol(Symbols.T_puti); }
 "prints"        { return createSymbol(Symbols.T_prints); }
 "print"         { return createSymbol(Symbols.T_print); }
+"strlen"        { return createSymbol(Symbols.T_strlen); }
+"#"             { return createSymbol(Symbols.T_NotEq); }
 
 
 
 {d}+            { return createSymbol(Symbols.T_num, Integer.valueOf(yytext())); }
 {l}+            { return createSymbol(Symbols.T_id, yytext()); }
-
+{str}           { return createSymbol(Symbols.T_string, yytext()); }
+{chr}           { return createSymbol(Symbols.T_char_literal, yytext()); }
 
 \$.*            {}
 "$$"([^$]|\$[^\$])*"$$"      {}
