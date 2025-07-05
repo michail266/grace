@@ -2,6 +2,7 @@ package gr.hua.dit.compiler.ast;
 
 import java.util.List;
 
+import gr.hua.dit.compiler.CompileContext;
 import gr.hua.dit.compiler.errors.SemanticException;
 import gr.hua.dit.compiler.Symbol.SymbolTable;
 import gr.hua.dit.compiler.types.FuncType;
@@ -52,6 +53,14 @@ public class FuncDef extends Stmt {
             body.sem(tbl);
         } finally {
             tbl.closeScope();
+        }
+    }
+    
+    public void compile(CompileContext context) {
+        // Only compile the main function for now
+        if ("main".equals(name)) {
+            // Compile the function body
+            body.compile(context);
         }
     }
 }
