@@ -140,39 +140,7 @@ public class Program  extends ASTNode {
     List<FuncDef> allFunctions = new ArrayList<>();
     extractAllFunctions(mainFunc, allFunctions);
     
-    // Find the specific functions we need
-    FuncDef mainFuncDef = null, solveFuncDef = null, hanoiFuncDef = null, moveFuncDef = null;
-    
-    for (FuncDef func : allFunctions) {
-      if ("main".equals(func.getName())) {
-        mainFuncDef = func;
-      } else if ("solve".equals(func.getName())) {
-        solveFuncDef = func;
-      } else if ("hanoi".equals(func.getName())) {
-        hanoiFuncDef = func;
-      } else if ("move".equals(func.getName())) {
-        moveFuncDef = func;
-      }
-    }
-    
-    // If we found all the expected functions, fix their bodies
-    if (mainFuncDef != null && solveFuncDef != null && hanoiFuncDef != null && moveFuncDef != null) {
-      // Based on the debug output and the expected Hanoi behavior:
-      // - main should call solve() (currently correct)
-      // - solve should have "Rings:" logic (currently in move)
-      // - hanoi should have if-then logic (currently correct)
-      // - move should have "Moving from" logic (currently in solve)
-      
-      // Swap the bodies between solve and move
-      result.add(new FuncDef(solveFuncDef.getName(), solveFuncDef.getParams(), solveFuncDef.getReturnType(), moveFuncDef.getBody()));
-      result.add(hanoiFuncDef);  // hanoi body is correct
-      result.add(new FuncDef(moveFuncDef.getName(), moveFuncDef.getParams(), moveFuncDef.getReturnType(), solveFuncDef.getBody()));
-      result.add(mainFuncDef);   // main body is correct
-      
-      return result;
-    }
-    
-    // Fallback to original function if we can't fix it
+
     result.add(mainFunc);
     return result;
   }
