@@ -1,6 +1,9 @@
 fun main() : nothing
 {
-  var a : int;
-  a <- 2;
-  puti(a);
+  var ab : int;
+  ab <- 2;
+  var x : int;
+  x <- ab;
+  ab <- ab+x;
+  puti(ab);
 }
